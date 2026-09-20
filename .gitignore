@@ -1,0 +1,13 @@
+.venv/
+.local/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.egg-info/
+artifacts/*
+!artifacts/.gitkeep
+*.dump
+*.zip
+.env
+.env.*
+!.env.example

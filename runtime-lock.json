@@ -1,0 +1,30 @@
+{
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "postgres_image": "postgres@sha256:dfbbb0ad8cab91d41e99123664e37a9b25d0413426d4fb3154e4d668e5d35246",
+  "postgres_version": "15.19",
+  "packages": {
+    "alembic": "1.20.0",
+    "annotated-types": "0.8.0",
+    "colorama": "0.4.6",
+    "greenlet": "3.5.6",
+    "iniconfig": "2.3.0",
+    "Mako": "1.4.1",
+    "MarkupSafe": "3.0.3",
+    "packaging": "26.3",
+    "pip": "25.0.1",
+    "pluggy": "1.6.0",
+    "psycopg": "3.3.6",
+    "psycopg-binary": "3.3.6",
+    "pydantic": "2.13.5",
+    "pydantic_core": "2.46.5",
+    "Pygments": "2.21.0",
+    "pytest": "9.1.1",
+    "setuptools": "82.0.1",
+    "SQLAlchemy": "2.0.54",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "tzdata": "2026.4"
+  },
+  "requirements_sha256": "0aa4e9e0eeac3a1e452ce488d9674a458e75b81285dbe28f6f660841dc2b5ea2"
+}

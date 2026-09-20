@@ -1,0 +1,21 @@
+"""M3 deterministic settlement evidence and reconciliation facts."""
+from alembic import op
+import sqlalchemy as sa
+
+revision = "m3_0006"
+down_revision = "m2_0005"
+
+
+def upgrade(profile, **kwargs):
+    uuid = sa.UUID()
+    def tenant(): return sa.Column("tenant_id", uuid, nullable=False)
+    op.create_table("feed_manifests", tenant(), sa.Column("run_id", uuid, nullable=False), sa.Column("feed_id", uuid, nullable=False), sa.Column("feed_type", sa.Text, nullable=False), sa.Column("source_uri", sa.Text, nullable=False), sa.Column("content_hash", sa.Text, nullable=False), sa.Column("record_count", sa.Integer, nullable=False), sa.Column("received_at", sa.DateTime(timezone=True), nullable=False), sa.PrimaryKeyConstraint("tenant_id", "feed_id"), sa.ForeignKeyConstraint(["tenant_id", "run_id"], ["resilience_v2.runs.tenant_id", "resilience_v2.runs.run_id"]), sa.UniqueConstraint("tenant_id", "run_id", "feed_type"), schema="resilience_v2")
+    op.create_table("settlement_observations", tenant(), sa.Column("run_id", uuid, nullable=False), sa.Column("observation_id", uuid, nullable=False), sa.Column("feed_id", uuid, nullable=False), sa.Column("source_event_key", sa.Text, nullable=False), sa.Column("business_key", sa.Text, nullable=False), sa.Column("amount_minor", sa.BigInteger, nullable=False), sa.Column("currency", sa.Text, nullable=False), sa.Column("observed_at", sa.DateTime(timezone=True), nullable=False), sa.Column("status", sa.Text, nullable=False), sa.PrimaryKeyConstraint("tenant_id", "observation_id"), sa.ForeignKeyConstraint(["tenant_id", "run_id"], ["resilience_v2.runs.tenant_id", "resilience_v2.runs.run_id"]), sa.ForeignKeyConstraint(["tenant_id", "feed_id"], ["resilience_v2.feed_manifests.tenant_id", "resilience_v2.feed_manifests.feed_id"]), sa.UniqueConstraint("tenant_id", "source_event_key"), sa.CheckConstraint("amount_minor > 0 AND currency='INR'"), schema="resilience_v2")
+    op.create_table("reconciliation_outcomes", tenant(), sa.Column("run_id", uuid, nullable=False), sa.Column("reconciliation_id", uuid, nullable=False), sa.Column("obligation_id", uuid, nullable=False), sa.Column("observation_id", uuid, nullable=True), sa.Column("expected_minor", sa.BigInteger, nullable=False), sa.Column("observed_minor", sa.BigInteger, nullable=False), sa.Column("outcome", sa.Text, nullable=False), sa.Column("quality_state", sa.Text, nullable=False), sa.Column("evidence_ref", sa.Text, nullable=False), sa.PrimaryKeyConstraint("tenant_id", "reconciliation_id"), sa.ForeignKeyConstraint(["tenant_id", "run_id"], ["resilience_v2.runs.tenant_id", "resilience_v2.runs.run_id"]), sa.ForeignKeyConstraint(["tenant_id", "obligation_id"], ["resilience_v2.settlement_obligations.tenant_id", "resilience_v2.settlement_obligations.obligation_id"]), sa.ForeignKeyConstraint(["tenant_id", "observation_id"], ["resilience_v2.settlement_observations.tenant_id", "resilience_v2.settlement_observations.observation_id"]), sa.CheckConstraint("outcome IN ('MATCHED','HELD','MISSING','MISMATCH')"), sa.CheckConstraint("quality_state IN ('TRUSTED','DEGRADED','UNRESOLVED')"), schema="resilience_v2")
+    op.create_table("metric_observations", tenant(), sa.Column("run_id", uuid, nullable=False), sa.Column("metric_id", uuid, nullable=False), sa.Column("metric_key", sa.Text, nullable=False), sa.Column("metric_value", sa.Numeric(20,6), nullable=False), sa.Column("unit", sa.Text, nullable=False), sa.Column("quality_state", sa.Text, nullable=False), sa.Column("evidence_refs", sa.JSON, nullable=False), sa.Column("observed_at", sa.DateTime(timezone=True), nullable=False), sa.PrimaryKeyConstraint("tenant_id", "metric_id"), sa.ForeignKeyConstraint(["tenant_id", "run_id"], ["resilience_v2.runs.tenant_id", "resilience_v2.runs.run_id"]), sa.UniqueConstraint("tenant_id", "run_id", "metric_key"), sa.CheckConstraint("quality_state IN ('TRUSTED','DEGRADED','UNRESOLVED')"), schema="resilience_v2")
+    op.execute(sa.text(f"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA resilience_v2 TO {profile.runtime_user}"))
+    op.execute(sa.text(f"REVOKE INSERT, UPDATE, DELETE ON resilience_v2.tenants, resilience_v2.actors, resilience_v2.environment_identity, resilience_v2.alembic_version FROM {profile.runtime_user}"))
+
+
+def downgrade(**kwargs):
+    raise RuntimeError("M3 downgrade disabled; rebuild disposable V2 database explicitly")
