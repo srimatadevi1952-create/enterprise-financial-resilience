@@ -7,7 +7,7 @@ M0 foundation established 19 September 2026. This is an isolated new codebase; i
 - Python 3.12.14 virtual environment and pinned dependencies.
 - PostgreSQL 15.19 container `efrco-v2-postgres-20260919`, bound only to `127.0.0.1:56432`, with persistent volume `efrco-v2-data-20260919`.
 - Separate databases `efrco_v2_dev` and `efrco_v2_test`, with separate runtime and migration roles.
-- M14 migration `m14_0017`; production-shaped scale profiles and benchmark evidence are available for isolated tests. No recovered V1 populations are imported.
+- M15 migration `m15_0018`; institutional metric definitions and evidence-linked metric values are available for isolated tests. No recovered V1 populations are imported.
 - Guarded read-only `doctor` command and isolation tests.
 - Runtime roles can read the identity/version tables but cannot alter, update or truncate them; test roles cannot connect to development.
 - M0 completion evidence is in the parent [M0 Completion Report](../M0_Completion_Report.md).
