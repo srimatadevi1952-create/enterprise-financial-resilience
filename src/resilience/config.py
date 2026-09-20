@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, SecretStr
 
 ROOT = Path(__file__).resolve().parents[2]
 NAMES = {"development": "efrco_v2_dev", "test": "efrco_v2_test"}
-REVISION = "m16_0019"
+REVISION = "m17_0020"
 
 
 class IsolationError(RuntimeError):
