@@ -1,0 +1,10 @@
+"""M21 read-only shadow execution evidence."""
+from alembic import op
+import sqlalchemy as sa
+revision='m21_0024'; down_revision='m20_0023'
+def upgrade(profile, **kwargs):
+ u=sa.UUID()
+ op.create_table('shadow_run_executions',sa.Column('tenant_id',u,nullable=False),sa.Column('execution_id',u,nullable=False),sa.Column('plan_id',u,nullable=False),sa.Column('source_profile',sa.Text,nullable=False),sa.Column('records_observed',sa.Integer,nullable=False),sa.Column('records_reconciled',sa.Integer,nullable=False),sa.Column('alerts_opened',sa.Integer,nullable=False),sa.Column('live_actions',sa.Integer,nullable=False),sa.Column('result_state',sa.Text,nullable=False),sa.Column('evidence_ref',sa.Text,nullable=False),sa.PrimaryKeyConstraint('tenant_id','execution_id'),sa.ForeignKeyConstraint(['tenant_id','plan_id'],['resilience_v2.shadow_run_plans.tenant_id','resilience_v2.shadow_run_plans.plan_id']),sa.CheckConstraint("result_state IN ('PASS','FAIL','REVIEW')"),sa.CheckConstraint('live_actions=0'),schema='resilience_v2')
+ op.create_table('shadow_observations',sa.Column('tenant_id',u,nullable=False),sa.Column('execution_id',u,nullable=False),sa.Column('observation_id',u,nullable=False),sa.Column('source_event_key',sa.Text,nullable=False),sa.Column('observation_state',sa.Text,nullable=False),sa.Column('evidence_ref',sa.Text,nullable=False),sa.PrimaryKeyConstraint('tenant_id','observation_id'),sa.ForeignKeyConstraint(['tenant_id','execution_id'],['resilience_v2.shadow_run_executions.tenant_id','resilience_v2.shadow_run_executions.execution_id']),sa.UniqueConstraint('tenant_id','source_event_key'),sa.CheckConstraint("observation_state IN ('OBSERVED','RECONCILED','EXCEPTION')"),schema='resilience_v2')
+ op.execute(sa.text(f"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA resilience_v2 TO {profile.runtime_user}"));op.execute(sa.text(f"REVOKE INSERT, UPDATE, DELETE ON resilience_v2.tenants, resilience_v2.actors, resilience_v2.environment_identity, resilience_v2.alembic_version FROM {profile.runtime_user}"))
+def downgrade(**kwargs): raise RuntimeError('M21 downgrade disabled; rebuild disposable V2 database explicitly')
