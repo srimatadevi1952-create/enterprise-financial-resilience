@@ -10,6 +10,6 @@ def test_m18_models_versioned_regulatory_transition_and_remediation():
   a.execute("INSERT INTO resilience_v2.tenants VALUES (%s,'m18-test','ACTIVE')",(tenant,));a.execute("INSERT INTO resilience_v2.actors VALUES (%s,%s,'m18-actor')",(tenant,actor));a.commit()
  with psycopg.connect(**p.connection_kwargs()) as c:
   with c.transaction(): b=build_fixture(c,tenant,experiment,actor);r=evaluate_regulatory_transition(c,tenant,b)
-  assert r=={'regimes':4,'affected_count':200,'remediation_count':100}
-  assert c.execute("SELECT count(*) FROM resilience_v2.regulatory_regimes WHERE tenant_id=%s",(tenant,)).fetchone()[0]==4
+  assert r=={'regimes':15,'affected_count':200,'remediation_count':100}
+  assert c.execute("SELECT count(*) FROM resilience_v2.regulatory_regimes WHERE tenant_id=%s",(tenant,)).fetchone()[0]==15
   assert c.execute("SELECT status FROM resilience_v2.compliance_remediations WHERE tenant_id=%s",(tenant,)).fetchone()[0]=='COMPLETE'
