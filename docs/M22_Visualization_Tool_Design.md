@@ -67,6 +67,40 @@ Controls are grouped into operational, regulatory, market, and recovery inputs:
 
 Every change creates a new immutable scenario draft. The user can run it, compare it with a selected branch, or discard it. The tool must display the active assumptions before showing results.
 
+## Operator console
+
+The visualization is paired with a studio-style operator console inspired by a professional recording desk. The console is a second work surface below or beside the 3D scene. It exposes the model parameters in organized control strips while the 3D network, heat maps, BowTie, charts, and executive results update together.
+
+### Console strips
+
+- **Population:** merchants, transaction volume, currencies, gateways, countries, and corridor selection
+- **Settlement:** delay hours, batch windows, retry rate, held-obligation policy, and reconciliation tolerance
+- **Gateway:** outage percentage, latency, duplicate rate, retry behavior, and provider selection
+- **Market:** FX shock, inflow shock, outflow surge, fee change, and funding cost
+- **Regulatory:** reserve rate, review rate, restriction state, effective date, and remediation speed
+- **Merchant risk:** merchant failure rate, concentration threshold, anomaly sensitivity, and exposure limit
+- **Systemic cascade:** initial nodes, propagation rate, wave interval, liquidity threshold, and recovery capacity
+- **Capital and liquidity:** starting capital, reserve draw, funding capacity, regeneration inflow, and recovery horizon
+- **Intervention:** selected action, approval requirement, execution timing, release scope, and control comparison
+
+Each strip has a value field, unit, range indicator, reset control, automation lane, and a small status meter. Controls are grouped by business meaning rather than by database table. Users can save a named scenario snapshot and compare it with baseline, stress, control, intervention, or systemic collapse.
+
+### Master controls
+
+The console has transport-style controls: Run, Pause, Step, Reset, Branch, Compare, and Commit Scenario. A time ruler shows the current simulation period and propagation wave. The operator can scrub to a specific event and inspect which controls changed the result.
+
+### Automation and what-if lanes
+
+Every parameter can be constant, stepped, ramped, or scripted over time. For example, an operator can ramp an FX shock from 0% to 12%, delay a gateway by six hours, then apply an intervention at wave three. The console displays the active automation curves and the resulting 3D propagation.
+
+### Live effect feedback
+
+When a control changes, the console shows the delta before committing the scenario: obligations newly held, liquidity change, capital change, risk-band movement, metric change, recovery-time change, and confidence impact. The 3D scene highlights the affected nodes and links, the heat map updates its cells, and the BowTie view highlights the activated threat or control.
+
+### Safety and reversibility
+
+The console is simulation-only. It cannot initiate payments, modify a source ledger, or enable live intervention. Every run is immutable, versioned, and replay-safe. Reset returns to the last committed scenario. The production shadow mode disables all financial action controls and exposes only read-only observation parameters.
+
 ## Results panel
 
 The results panel reports completion, held obligations, exposure, liquidity, capital, stability, fragility, recovery time, enterprise class, alerts, and confidence. Each number has an evidence link to the run, feed, metric definition, observation, or decision record that supports it.
