@@ -1,0 +1,10 @@
+"""M11 enterprise classification and comparative resilience facts."""
+from alembic import op
+import sqlalchemy as sa
+revision='m11_0014'; down_revision='m10_0013'
+def upgrade(profile, **kwargs):
+ u=sa.UUID()
+ op.create_table('enterprise_classifications',sa.Column('tenant_id',u,nullable=False),sa.Column('run_id',u,nullable=False),sa.Column('classification_id',u,nullable=False),sa.Column('condition_class',sa.Text,nullable=False),sa.Column('resilience_score',sa.Numeric(8,4),nullable=False),sa.Column('confidence_pct',sa.Numeric(8,4),nullable=False),sa.Column('primary_driver',sa.Text,nullable=False),sa.Column('evidence_refs',sa.JSON,nullable=False),sa.Column('classified_at',sa.DateTime(timezone=True),nullable=False),sa.PrimaryKeyConstraint('tenant_id','classification_id'),sa.ForeignKeyConstraint(['tenant_id','run_id'],['resilience_v2.runs.tenant_id','resilience_v2.runs.run_id']),sa.CheckConstraint("condition_class IN ('STABLE','WATCH','STRESSED','CRITICAL','RECOVERY','RESILIENT')"),schema='resilience_v2')
+ op.create_table('comparative_resilience_scores',sa.Column('tenant_id',u,nullable=False),sa.Column('experiment_id',u,nullable=False),sa.Column('comparison_id',u,nullable=False),sa.Column('scenario_key',sa.Text,nullable=False),sa.Column('completion_pct',sa.Numeric(8,4),nullable=False),sa.Column('recovery_score',sa.Numeric(8,4),nullable=False),sa.Column('delta_vs_baseline',sa.Numeric(8,4),nullable=False),sa.Column('rank',sa.Integer,nullable=False),sa.Column('evidence_refs',sa.JSON,nullable=False),sa.PrimaryKeyConstraint('tenant_id','comparison_id'),sa.ForeignKeyConstraint(['tenant_id','experiment_id'],['resilience_v2.experiments.tenant_id','resilience_v2.experiments.experiment_id']),schema='resilience_v2')
+ op.execute(sa.text(f"GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA resilience_v2 TO {profile.runtime_user}"));op.execute(sa.text(f"REVOKE INSERT, UPDATE, DELETE ON resilience_v2.tenants, resilience_v2.actors, resilience_v2.environment_identity, resilience_v2.alembic_version FROM {profile.runtime_user}"))
+def downgrade(**kwargs): raise RuntimeError('M11 downgrade disabled; rebuild disposable V2 database explicitly')
