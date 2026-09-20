@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "environment": "test",
+  "tenants": [
+    {
+      "tenant_id": "cf18dd91-1b2b-4c9e-b32b-b712ac831e1a",
+      "recovery": {
+        "intervention_id": "b27c0b61-7ae7-512c-abe2-81affbfb5dbd",
+        "released": 20,
+        "completion_pct": 100.0
+      },
+      "pilot_gates": {
+        "contract_id": "86c4c265-c67c-5b02-a7b0-2b1fcbd657e3",
+        "gates": 4,
+        "alert_id": "798c578c-100d-5fe3-b2ae-36e43cf15846"
+      },
+      "faults": 4,
+      "all_gates_passed": true
+    },
+    {
+      "tenant_id": "caaaaf20-2832-49b4-a519-e8d483e8c12a",
+      "recovery": {
+        "intervention_id": "b27c0b61-7ae7-512c-abe2-81affbfb5dbd",
+        "released": 20,
+        "completion_pct": 100.0
+      },
+      "pilot_gates": {
+        "contract_id": "eafadcd6-5f6d-5a01-899c-fbf8a12e16d3",
+        "gates": 4,
+        "alert_id": "798c578c-100d-5fe3-b2ae-36e43cf15846"
+      },
+      "faults": 4,
+      "all_gates_passed": true
+    },
+    {
+      "tenant_id": "91c930a2-7d3e-4d7b-97e4-77d314ec563f",
+      "recovery": {
+        "intervention_id": "b27c0b61-7ae7-512c-abe2-81affbfb5dbd",
+        "released": 20,
+        "completion_pct": 100.0
+      },
+      "pilot_gates": {
+        "contract_id": "3ac39741-69a7-5ff3-837f-27d1b2f7adb2",
+        "gates": 4,
+        "alert_id": "798c578c-100d-5fe3-b2ae-36e43cf15846"
+      },
+      "faults": 4,
+      "all_gates_passed": true
+    }
+  ],
+  "total_obligations": 2400,
+  "total_faults": 12
+}
