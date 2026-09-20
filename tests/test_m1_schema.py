@@ -10,7 +10,7 @@ def test_m1_schema_and_runtime_grants():
     with psycopg.connect(**p.connection_kwargs()) as c:
         tables = {r[0] for r in c.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='resilience_v2'").fetchall()}
         assert {"environment_identity", "alembic_version", "tenants", "runs", "transactions", "settlement_obligations", "run_events", "commands", "jobs"}.issubset(tables)
-        assert c.execute("SELECT version_num FROM resilience_v2.alembic_version").fetchone()[0] == "m12_0015"
+        assert c.execute("SELECT version_num FROM resilience_v2.alembic_version").fetchone()[0] == "m13_0016"
         assert c.execute("SELECT has_table_privilege(current_user,'resilience_v2.runs','SELECT')").fetchone()[0]
 
 
