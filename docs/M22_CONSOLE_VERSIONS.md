@@ -21,3 +21,5 @@ Both design directions are retained in the repository. The selected dashboard di
 - Adds selectable countries and corridors, live scenario controls, calculated metrics, scenario presets, and animated simulation playback.
 
 V1 is the approved visual and interaction direction for the production dashboard. Its globe-centered composition will guide the next implementation stage. V2 remains available as a source for reusable map and scenario-control interactions.
+
+The six channel-specific popup concepts and their interaction rules are recorded in the [M22 Control Popup UX/UI Design](M22_CONTROL_POPUP_UX_DESIGN.md).
