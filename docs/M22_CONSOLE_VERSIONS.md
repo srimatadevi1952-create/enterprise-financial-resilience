@@ -1,17 +1,19 @@
 # M22 Console Versions
 
-Both approved design directions are retained in the repository.
+Both design directions are retained in the repository. The selected dashboard direction is **V1 — Editorial globe concept**.
 
 ## V1 — Editorial globe concept
 
+- Status: **Selected dashboard design**
 - Artifact: [`assets/m22-console-editorial-concept.png`](assets/m22-console-editorial-concept.png)
 - Git tag: `m22-globe-concept-v1`
 - Preserves the earlier central-globe composition, orbital geometry, warm paper surface, graphite texture, and burnt-orange operator-console language.
 
 ## V2 — Interactive world-map console
 
+- Status: Alternate prototype retained for reference
 - Artifact: [`m22-interactive-world-console.html`](m22-interactive-world-console.html)
 - Replaces the globe with a projected world map while retaining the V1 visual grammar.
 - Adds selectable countries and corridors, live scenario controls, calculated metrics, scenario presets, and animated simulation playback.
 
-The V1 image remains available as the visual reference for future refinements. V2 is the current interactive prototype.
+V1 is the approved visual and interaction direction for the production dashboard. Its globe-centered composition will guide the next implementation stage. V2 remains available as a source for reusable map and scenario-control interactions.
