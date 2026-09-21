@@ -26,6 +26,8 @@ Allows a user to change scenario inputs, run a time-step simulation, compare bra
 
 The main view is a 3D enterprise network. The enterprise is central, with merchants, gateways, banks, corridors, and country nodes arranged in a navigable scene. Animated links represent settlement flows. Node size represents exposure. Node color represents condition class. Link thickness represents value or volume. A timeline controls playback of stress propagation and recovery.
 
+The orbital model distinguishes two domains. The inner-enterprise ring contains Capital, Liquidity and Operations. The external-environment ring contains Regulation, Merchants and Countries & Corridors. Connections show how external shocks propagate into internal conditions and ultimately change the Enterprise Resilience Index. A visual legend differentiates internal conditions, external forces, management interventions and calculated outcomes.
+
 The 3D scene is an explanatory network, not a geographic claim. A separate geographic view uses country and corridor geometry when location matters.
 
 ## Risk visualization surfaces

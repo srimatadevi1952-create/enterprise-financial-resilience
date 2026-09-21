@@ -17,3 +17,11 @@ The production implementation should preserve:
 The interactive world-map prototype remains archived as an alternate and as a source for corridor-selection and simulation-control behavior.
 
 The approved V1.2 artwork therefore uses **Operations** for both channel 03 and the corresponding orbital dimension. References to **Enterprise Resilience** are retained only where they identify the system or its calculated outcome.
+
+V1.3 establishes the enterprise boundary visually:
+
+- **Inner Enterprise:** Capital, Liquidity and Operations
+- **External Environment:** Regulation, Merchants and Countries & Corridors
+- **Calculated Outcome:** Enterprise Resilience Index
+
+External shocks propagate through the internal enterprise condition before changing the resilience outcome. Management interventions can act on either layer but remain simulation-only within this interface.

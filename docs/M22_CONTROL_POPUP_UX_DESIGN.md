@@ -1,7 +1,10 @@
 # M22 Control Popup UX/UI Design
 
-**Foundation:** `m22-globe-concept-v1.2-operations-orbit`  
+**Production foundation:** `m22-console-editorial-concept-v1.3-enterprise-environment`
+
 **Purpose:** Provide direct manipulation of the 220 simulation variables through six channel-specific parameter decks.
+
+The concept images below were composed on V1.2 and remain valid for popup layout and interaction. The production implementation uses the V1.3 inner-enterprise and external-environment orbital model beneath the same decks.
 
 ## Interaction model
 
