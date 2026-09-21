@@ -25,3 +25,5 @@ V1.3 establishes the enterprise boundary visually:
 - **Calculated Outcome:** Enterprise Resilience Index
 
 External shocks propagate through the internal enterprise condition before changing the resilience outcome. Management interventions can act on either layer but remain simulation-only within this interface.
+
+V1.4 makes the Enterprise Core a calculated heat-map surface. Probability × Impact determines zone intensity; affected internal domains determine position; external sources connect to those zones; and recovery actions reduce or recolour the heat over time. The detailed behaviour is defined in [M22 Enterprise Core Heat-Map Behaviour](M22_CORE_HEATMAP_BEHAVIOR.md).

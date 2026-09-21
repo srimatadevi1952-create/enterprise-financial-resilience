@@ -5,7 +5,8 @@ Both design directions are retained in the repository. The selected dashboard di
 ## V1 — Editorial globe concept
 
 - Status: **Selected dashboard design**
-- Current artifact: [`assets/m22-console-editorial-concept-v1.3-enterprise-environment.png`](assets/m22-console-editorial-concept-v1.3-enterprise-environment.png)
+- Current artifact: [`assets/m22-console-editorial-concept-v1.4-core-heatmap.png`](assets/m22-console-editorial-concept-v1.4-core-heatmap.png)
+- Previous revision: [`assets/m22-console-editorial-concept-v1.3-enterprise-environment.png`](assets/m22-console-editorial-concept-v1.3-enterprise-environment.png)
 - Previous revision: [`assets/m22-console-editorial-concept-v1.2-operations-orbit.png`](assets/m22-console-editorial-concept-v1.2-operations-orbit.png)
 - Previous revision: [`assets/m22-console-editorial-concept-v1.1-operations.png`](assets/m22-console-editorial-concept-v1.1-operations.png)
 - Original artifact: [`assets/m22-console-editorial-concept.png`](assets/m22-console-editorial-concept.png)
@@ -14,6 +15,7 @@ Both design directions are retained in the repository. The selected dashboard di
 - Revision V1.1 replaces input channel `03 RESILIENCE` with `03 OPERATIONS`. Enterprise resilience remains the calculated `87/100` outcome.
 - Revision V1.2 also replaces the `RESILIENCE` orbital input label surrounding the enterprise core with `OPERATIONS`, completing the input/outcome distinction.
 - Revision V1.3 separates the model into an inner-enterprise orbit for Capital, Liquidity and Operations and an external-environment orbit for Regulation, Merchants and Countries & Corridors. A compact legend distinguishes internal conditions, external forces, management interventions and calculated outcomes.
+- Revision V1.4 turns the Enterprise Core into a dynamic Probability × Impact heat map. Burnt-orange hotspots, amber exposure zones, teal recovery zones and graphite stable regions update with scenario state and timeline playback.
 
 ## V2 — Interactive world-map console
 

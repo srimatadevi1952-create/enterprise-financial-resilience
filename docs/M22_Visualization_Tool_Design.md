@@ -28,6 +28,8 @@ The main view is a 3D enterprise network. The enterprise is central, with mercha
 
 The orbital model distinguishes two domains. The inner-enterprise ring contains Capital, Liquidity and Operations. The external-environment ring contains Regulation, Merchants and Countries & Corridors. Connections show how external shocks propagate into internal conditions and ultimately change the Enterprise Resilience Index. A visual legend differentiates internal conditions, external forces, management interventions and calculated outcomes.
 
+The Enterprise Core is a dynamic Probability × Impact heat map. Its textured surface uses graphite for stable capacity, teal for low-risk or recovery conditions, amber for medium exposure and burnt orange for high-risk hotspots. Matrix cells, core zones, orbital sources, BowTie events and outcome charts cross-highlight. The heat state evolves during timeline playback and follows the rules in [M22 Enterprise Core Heat-Map Behaviour](M22_CORE_HEATMAP_BEHAVIOR.md).
+
 The 3D scene is an explanatory network, not a geographic claim. A separate geographic view uses country and corridor geometry when location matters.
 
 ## Risk visualization surfaces
