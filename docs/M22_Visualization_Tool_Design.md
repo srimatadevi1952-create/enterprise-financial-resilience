@@ -77,6 +77,8 @@ Every change creates a new immutable scenario draft. The user can run it, compar
 
 ## Operator console
 
+The dashboard has two explicit operating shells. Live Monitor is the default read-only view. Simulation Lab is an isolated, individually authorised workspace created from a timestamped baseline. Switching affects only the requesting user's view and never interrupts live monitoring. The Simulation Lab owner can present the screen or invite authenticated collaborators under scoped roles. Detailed rules are defined in [M22 Operating Modes, Authorization and Collaboration](M22_OPERATING_MODES_AUTHORIZATION_COLLABORATION.md).
+
 The visualization is paired with a studio-style operator console inspired by a professional recording desk. The console is a second work surface below or beside the 3D scene. It exposes the model parameters in organized control strips while the 3D network, heat maps, BowTie, charts, and executive results update together.
 
 ### Console strips

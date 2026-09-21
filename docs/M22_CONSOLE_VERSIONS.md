@@ -5,8 +5,10 @@ Both design directions are retained in the repository. The selected dashboard di
 ## V1 — Editorial globe concept
 
 - Status: **Selected dashboard design**
-- Current artifact: [`assets/m22-console-editorial-concept-v1.8-stable-baseline.png`](assets/m22-console-editorial-concept-v1.8-stable-baseline.png)
-- Active-stress example: [`assets/m22-console-editorial-concept-v1.7-bowtie-active-severity.png`](assets/m22-console-editorial-concept-v1.7-bowtie-active-severity.png)
+- Current Live Monitor artifact: [`assets/m22-operating-modes/01-live-monitor-authorized-view.png`](assets/m22-operating-modes/01-live-monitor-authorized-view.png)
+- Current Simulation Lab artifact: [`assets/m22-operating-modes/02-simulation-lab-private-collaboration.png`](assets/m22-operating-modes/02-simulation-lab-private-collaboration.png)
+- Stable dashboard foundation: [`assets/m22-console-editorial-concept-v1.8-stable-baseline.png`](assets/m22-console-editorial-concept-v1.8-stable-baseline.png)
+- Active-stress foundation: [`assets/m22-console-editorial-concept-v1.7-bowtie-active-severity.png`](assets/m22-console-editorial-concept-v1.7-bowtie-active-severity.png)
 - Previous revision: [`assets/m22-console-editorial-concept-v1.6-unified-matrix-core-gradient.png`](assets/m22-console-editorial-concept-v1.6-unified-matrix-core-gradient.png)
 - Previous revision: [`assets/m22-console-editorial-concept-v1.5-single-state-core-temperature.png`](assets/m22-console-editorial-concept-v1.5-single-state-core-temperature.png)
 - Previous revision: [`assets/m22-console-editorial-concept-v1.4-core-heatmap.png`](assets/m22-console-editorial-concept-v1.4-core-heatmap.png)
@@ -24,6 +26,7 @@ Both design directions are retained in the repository. The selected dashboard di
 - Revision V1.6 removes the redundant core-temperature panel. Matrix-circle area and a continuous pale-yellow-to-deep-orange gradient both encode the `0–10 × 0–10` Probability × Impact product; the core uses the exact colour of the active matrix point.
 - Revision V1.7 applies the shared severity palette to the Payment Disruption BowTie. Inactive attributes and paths remain black; only active elements change from pale yellow to deep orange according to their individual severity.
 - Revision V1.8 establishes the stable baseline: at `0,0`, the core returns to its original graphite appearance, the matrix shows a graphite origin marker and all Payment Disruption attributes are inactive black. Risk colour begins only above zero.
+- Revision V1.9 adds a persistent mode control, authorization status and isolated collaboration controls. Live Monitor remains the default read-only mode; Simulation Lab is privately enabled only after an individual authorization check.
 
 ## V2 — Interactive world-map console
 
@@ -35,3 +38,5 @@ Both design directions are retained in the repository. The selected dashboard di
 V1 is the approved visual and interaction direction for the production dashboard. Its globe-centered composition will guide the next implementation stage. V2 remains available as a source for reusable map and scenario-control interactions.
 
 The six channel-specific popup concepts and their interaction rules are recorded in the [M22 Control Popup UX/UI Design](M22_CONTROL_POPUP_UX_DESIGN.md).
+
+The Live Monitor and authorised private Simulation Lab isolation, authorization and sharing rules are defined in [M22 Operating Modes, Authorization and Collaboration](M22_OPERATING_MODES_AUTHORIZATION_COLLABORATION.md).
