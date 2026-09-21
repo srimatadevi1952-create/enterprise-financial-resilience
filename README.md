@@ -14,6 +14,18 @@ M0 foundation established 19 September 2026. This is an isolated new codebase; i
 
 M5 now records run manifests, intervention approvals, replay keys, decision records, and feed-quality incidents alongside the closed-loop recovery experiment.
 
+M22 now includes a working local web console that integrates the approved editorial visual system with the V2 application package. Live Monitor is immutable; an entitled user can create an isolated private Simulation Lab, manipulate the six control groups backed by the 220-variable register, run a what-if scenario, return to the unchanged live state, and invite scoped collaborators.
+
+## Open the integrated console
+
+The console is restricted to the local development profile and binds only to `127.0.0.1`:
+
+```powershell
+.\.venv\Scripts\python.exe -m resilience.cli console --profile development --port 8766
+```
+
+Open `http://127.0.0.1:8766/`. The current identity adapter and session store are development-only. Production deployment requires the organisation's identity provider, durable session and audit storage, approved live-data feeds, and collaboration-provider integration.
+
 ## Check the environment
 
 From this directory in PowerShell:

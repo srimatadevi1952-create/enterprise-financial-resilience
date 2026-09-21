@@ -5,11 +5,19 @@ from .database import connect_guarded
 
 
 def main():
-    parser = argparse.ArgumentParser(description="V2 isolated environment checks; no simulation engine installed")
-    parser.add_argument("command", choices=["doctor"])
+    parser = argparse.ArgumentParser(description="Enterprise Financial Resilience V2")
+    parser.add_argument("command", choices=["doctor", "console"])
     parser.add_argument("--profile", required=True, choices=["development", "test"])
+    parser.add_argument("--port", type=int, default=8766)
     args = parser.parse_args()
     try:
+        if args.command == "console":
+            if args.profile != "development":
+                raise IsolationError("CONSOLE_REQUIRES_DEVELOPMENT_PROFILE")
+            load_profile(args.profile)
+            from .m22_web import serve
+            serve(port=args.port)
+            return
         profile = load_profile(args.profile)
         with connect_guarded(profile, args.profile) as conn:
             version = conn.execute("SHOW server_version").fetchone()[0]
