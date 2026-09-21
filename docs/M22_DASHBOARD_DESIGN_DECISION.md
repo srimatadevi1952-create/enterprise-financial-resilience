@@ -26,4 +26,4 @@ V1.3 establishes the enterprise boundary visually:
 
 External shocks propagate through the internal enterprise condition before changing the resilience outcome. Management interventions can act on either layer but remain simulation-only within this interface.
 
-V1.4 makes the Enterprise Core a calculated heat-map surface. Probability × Impact determines zone intensity; affected internal domains determine position; external sources connect to those zones; and recovery actions reduce or recolour the heat over time. The detailed behaviour is defined in [M22 Enterprise Core Heat-Map Behaviour](M22_CORE_HEATMAP_BEHAVIOR.md).
+V1.4 explored a multizone core heat map and is retained as superseded history. V1.5 establishes the approved single-state model: the Probability × Impact matrix and Enterprise Core represent the same consolidated condition, with one active matrix colour and one matching uniform core colour. The detailed rules are defined in [M22 Enterprise Core Temperature Behaviour](M22_CORE_TEMPERATURE_BEHAVIOR.md).

@@ -1,4 +1,6 @@
-# M22 Enterprise Core Heat-Map Behaviour
+# M22 Enterprise Core Heat-Map Behaviour — V1.4 Superseded
+
+This multizone model was superseded by the single-state model in [M22 Enterprise Core Temperature Behaviour](M22_CORE_TEMPERATURE_BEHAVIOR.md). It is retained only as a version-history record.
 
 **Visual foundation:** `m22-console-editorial-concept-v1.4-core-heatmap`
 
