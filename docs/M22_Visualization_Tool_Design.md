@@ -75,6 +75,8 @@ The visualization is paired with a studio-style operator console inspired by a p
 
 The six master input channels are **Capital, Liquidity, Operations, Regulation, Merchants, and Corridors**. **Enterprise Resilience** is a calculated outcome that responds to these inputs and is displayed in the results area as the Enterprise Resilience Index.
 
+The authoritative implementation inventory is the [M22 Manipulated Variable Register](M22_MANIPULATED_VARIABLE_REGISTER.md), with its machine-readable companion at `config/m22_manipulated_variables.csv`. It defines 220 variables across the six controls and distinguishes starting states, external shocks, behavioural assumptions, and management interventions.
+
 - **Population:** merchants, transaction volume, currencies, gateways, countries, and corridor selection
 - **Settlement:** delay hours, batch windows, retry rate, held-obligation policy, and reconciliation tolerance
 - **Gateway:** outage percentage, latency, duplicate rate, retry behavior, and provider selection
