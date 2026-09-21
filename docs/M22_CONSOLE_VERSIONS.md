@@ -5,11 +5,13 @@ Both design directions are retained in the repository. The selected dashboard di
 ## V1 — Editorial globe concept
 
 - Status: **Selected dashboard design**
-- Current artifact: [`assets/m22-console-editorial-concept-v1.1-operations.png`](assets/m22-console-editorial-concept-v1.1-operations.png)
+- Current artifact: [`assets/m22-console-editorial-concept-v1.2-operations-orbit.png`](assets/m22-console-editorial-concept-v1.2-operations-orbit.png)
+- Previous revision: [`assets/m22-console-editorial-concept-v1.1-operations.png`](assets/m22-console-editorial-concept-v1.1-operations.png)
 - Original artifact: [`assets/m22-console-editorial-concept.png`](assets/m22-console-editorial-concept.png)
 - Git tag: `m22-globe-concept-v1`
 - Preserves the earlier central-globe composition, orbital geometry, warm paper surface, graphite texture, and burnt-orange operator-console language.
 - Revision V1.1 replaces input channel `03 RESILIENCE` with `03 OPERATIONS`. Enterprise resilience remains the calculated `87/100` outcome.
+- Revision V1.2 also replaces the `RESILIENCE` orbital input label surrounding the enterprise core with `OPERATIONS`, completing the input/outcome distinction.
 
 ## V2 — Interactive world-map console
 

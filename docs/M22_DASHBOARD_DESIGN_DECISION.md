@@ -15,3 +15,5 @@ The production implementation should preserve:
 - the sparse scientific-editorial typography and fine-line visual grammar.
 
 The interactive world-map prototype remains archived as an alternate and as a source for corridor-selection and simulation-control behavior.
+
+The approved V1.2 artwork therefore uses **Operations** for both channel 03 and the corresponding orbital dimension. References to **Enterprise Resilience** are retained only where they identify the system or its calculated outcome.
