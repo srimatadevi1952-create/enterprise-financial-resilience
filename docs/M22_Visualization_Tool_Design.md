@@ -42,6 +42,8 @@ Rows represent merchants, corridors, countries, or risk dimensions. Columns repr
 
 The center event is the selected failure, such as settlement delay, gateway outage, regulatory restriction, or liquidity shortfall. The left side shows threats and preventive controls. The right side shows consequences, recovery controls, and decision actions. Each node links to evidence.
 
+Inactive BowTie attributes and path segments remain graphite black. Only active threats, consequences and propagated paths use the shared pale-yellow-to-deep-orange palette, with shade determined by the individual attribute's severity. Geometry remains fixed. The central event uses the aggregate selected-risk severity. Payment Disruption follows [M22 Payment Disruption BowTie Behaviour](M22_PAYMENT_DISRUPTION_BOWTIE_BEHAVIOR.md).
+
 ### Trend and trajectory charts
 
 Time-series views show stability grade, fragility index, shock absorption capacity, capital compression, liquidity balance, and recovery progress. Scenario lines share a common scale so baseline, stress, control, and intervention can be compared directly.
