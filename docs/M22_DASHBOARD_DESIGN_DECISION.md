@@ -10,7 +10,8 @@ The production implementation should preserve:
 - the central enterprise-core globe and orbital risk model;
 - the warm ivory paper surface, graphite texture, burnt-orange emphasis, and restrained teal accents;
 - the probability-impact matrix, BowTie view, capital trajectory, resilience index, and scenario timeline;
-- the recording-studio-style operator console with controls for capital, liquidity, resilience, regulation, merchants, and corridors;
+- the recording-studio-style operator console with controls for capital, liquidity, operations, regulation, merchants, and corridors;
+- enterprise resilience as a calculated outcome produced by the six control dimensions, rather than as an operator input;
 - the sparse scientific-editorial typography and fine-line visual grammar.
 
 The interactive world-map prototype remains archived as an alternate and as a source for corridor-selection and simulation-control behavior.

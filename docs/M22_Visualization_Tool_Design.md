@@ -73,6 +73,8 @@ The visualization is paired with a studio-style operator console inspired by a p
 
 ### Console strips
 
+The six master input channels are **Capital, Liquidity, Operations, Regulation, Merchants, and Corridors**. **Enterprise Resilience** is a calculated outcome that responds to these inputs and is displayed in the results area as the Enterprise Resilience Index.
+
 - **Population:** merchants, transaction volume, currencies, gateways, countries, and corridor selection
 - **Settlement:** delay hours, batch windows, retry rate, held-obligation policy, and reconciliation tolerance
 - **Gateway:** outage percentage, latency, duplicate rate, retry behavior, and provider selection
