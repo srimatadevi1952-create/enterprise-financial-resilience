@@ -22,6 +22,12 @@ The concept artwork shows the priority variables for each control. The working i
 ## Shared behaviour
 
 - Opening a deck never runs a simulation.
+- Every parameter deck is draggable by its title bar so the user can reposition it without losing sight of relevant dashboard information.
+- Dragging is constrained to the dashboard workspace; the title bar, close control and draft-status indicator must always remain reachable.
+- A deck can snap to the top, bottom, left, right or its originating console channel, and `RESET POSITION` returns it to the default anchored location.
+- The interface remembers each user's preferred deck position and restores it when that control is opened again.
+- Keyboard users can move the deck in defined increments and return it to its default position; pointer and touch dragging receive equivalent behaviour.
+- Moving a deck changes presentation only and never changes a model parameter, scenario value or simulation result.
 - Parameter changes remain local to a scenario draft.
 - `APPLY TO DRAFT` validates the changes, records evidence and updates the preview.
 - `RUN` executes the complete draft through the simulation engine.
@@ -30,6 +36,21 @@ The concept artwork shows the priority variables for each control. The working i
 - Invalid ranges, incompatible combinations and missing evidence are identified before application.
 - Keyboard focus moves into the opened deck and returns to its channel when closed.
 - Escape closes the deck only when there are no unapplied changes; otherwise it opens a discard-changes decision.
+
+## Draggable-window requirement
+
+The title area is the dedicated drag handle. Interactive controls inside the deck never initiate a drag. While moving, the deck uses a lightweight outline preview and displays available snap zones. On release, it settles into the selected position without covering the active channel unless the user placed it there deliberately.
+
+The production implementation must support:
+
+- mouse, trackpad, touch and keyboard movement;
+- viewport boundaries and collision handling;
+- zoom and responsive-layout changes;
+- position persistence by user and control;
+- `RESET POSITION` and `RESET ALL POSITIONS` commands;
+- visible focus, descriptive accessible labels and announced position changes;
+- reduced-motion preferences;
+- deterministic screen position in exported evidence and screenshots.
 
 ## Six parameter decks
 

@@ -93,6 +93,8 @@ Each strip has a value field, unit, range indicator, reset control, automation l
 
 The console has transport-style controls: Run, Pause, Step, Reset, Branch, Compare, and Commit Scenario. A time ruler shows the current simulation period and propagation wave. The operator can scrub to a specific event and inspect which controls changed the result.
 
+Each channel opens a draggable parameter deck. The user can position the deck anywhere within the dashboard workspace, snap it to an edge or return it to its default channel-anchored position. Movement must support pointer, touch and keyboard input, preserve access to the title bar and safety status, and affect presentation only.
+
 ### Automation and what-if lanes
 
 Every parameter can be constant, stepped, ramped, or scripted over time. For example, an operator can ramp an FX shock from 0% to 12%, delay a gateway by six hours, then apply an intervention at wave three. The console displays the active automation curves and the resulting 3D propagation.
