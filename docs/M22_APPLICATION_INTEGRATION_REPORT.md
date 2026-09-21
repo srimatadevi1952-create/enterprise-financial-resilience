@@ -5,7 +5,7 @@
 
 ## Integrated application slice
 
-The approved editorial console is now implemented as a working web surface inside the V2 Python application. It is served by `resilience.m22_web`, uses the M22 220-variable register, and delegates authorization, session isolation, scenario calculation and collaboration rules to the testable `resilience.m22_console` service.
+The approved editorial console is now implemented as a working Canvas application inside the V2 Python application. The approved 1881 × 1073 artwork is the rendering master, so the full console scales as one coordinated surface without HTML reflow or page scrolling. It is served by `resilience.m22_web`, uses the M22 220-variable register, and delegates authorization, session isolation, scenario calculation and collaboration rules to the testable `resilience.m22_console` service. The earlier DOM implementation remains preserved as `dom-console-v2.html`.
 
 The initial application supports:
 
@@ -20,6 +20,8 @@ The initial application supports:
 - owner-controlled Viewer, Co-analyst, Approver and Auditor invitations;
 - explicit separation between Meet/Zoom screen presentation and authenticated console participation;
 - local-only hosting on `127.0.0.1` under the explicit development profile.
+- pixel-matched Canvas rendering with resolution-independent hit testing and high-density display support.
+- keyboard access for Live Monitor (`L`), Simulation Lab (`S`), parameter decks (`1`–`6`), Run (`R`) and Close (`Escape`).
 
 ## Verification completed
 
@@ -29,6 +31,7 @@ The initial application supports:
 - A collaborator invitation appeared only in the private session.
 - A Viewer cannot edit a simulation; a Co-analyst can be granted edit scope by the owner.
 - The application produced no browser errors during the verified flow.
+- The Canvas exactly fits the viewport dimensions and introduces no horizontal or vertical document scrolling.
 - The automated M22 service checks pass.
 
 ## Production adapters still required

@@ -14,7 +14,7 @@ M0 foundation established 19 September 2026. This is an isolated new codebase; i
 
 M5 now records run manifests, intervention approvals, replay keys, decision records, and feed-quality incidents alongside the closed-loop recovery experiment.
 
-M22 now includes a working local web console that integrates the approved editorial visual system with the V2 application package. Live Monitor is immutable; an entitled user can create an isolated private Simulation Lab, manipulate the six control groups backed by the 220-variable register, run a what-if scenario, return to the unchanged live state, and invite scoped collaborators.
+M22 now includes a working Canvas-rendered console that uses the approved editorial artwork as its pixel-accurate master surface. It scales as one instrument panel without reflow or scrolling. Live Monitor is immutable; an entitled user can create an isolated private Simulation Lab, manipulate the six control groups backed by the 220-variable register, run a what-if scenario, return to the unchanged live state, and invite scoped collaborators. The earlier DOM/HTML implementation is retained at `/dom-console-v2.html` for reference.
 
 ## Open the integrated console
 

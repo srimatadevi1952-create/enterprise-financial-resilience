@@ -53,6 +53,10 @@ def make_handler(application: ConsoleApplication):
                     self._error(exc)
             elif path.startswith("/assets/"):
                 self._file(ASSET_ROOT / path.removeprefix("/assets/"))
+            elif path.startswith("/web-assets/"):
+                self._file(WEB_ROOT / path.removeprefix("/web-assets/"))
+            elif path == "/dom-console-v2.html":
+                self._file(WEB_ROOT / "dom-console-v2.html")
             elif path in {"/", "/index.html"}:
                 self._file(WEB_ROOT / "index.html")
             else:

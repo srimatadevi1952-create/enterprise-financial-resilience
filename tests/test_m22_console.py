@@ -4,6 +4,7 @@ from resilience.m22_console import (
     ConsoleService,
     Principal,
 )
+from resilience.config import ROOT
 
 
 ANALYST = Principal("analyst-1", "Asha Iyer", frozenset({"live:view", "simulation:create", "simulation:share"}))
@@ -42,3 +43,12 @@ def test_sharing_is_scoped_and_does_not_expose_other_sessions():
         assert str(exc) == "SIMULATION_EDIT_DENIED"
     else:
         raise AssertionError("viewer edited a simulation")
+
+
+def test_canvas_console_packages_the_approved_master_and_preserves_dom_version():
+    web = ROOT / "src" / "resilience" / "web"
+    index = (web / "index.html").read_text(encoding="utf-8")
+    assert "m22-console-canvas-master-v2.png" in index
+    assert "const DESIGN={w:1881,h:1073}" in index
+    assert (web / "m22-console-canvas-master-v2.png").stat().st_size > 100_000
+    assert (web / "dom-console-v2.html").exists()

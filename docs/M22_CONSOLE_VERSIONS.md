@@ -2,6 +2,8 @@
 
 Both design directions are retained in the repository. The selected dashboard direction is **V1 — Editorial globe concept**.
 
+The production-facing application renderer is now the **Canvas edition**, which uses the approved concept artwork as the pixel master and adds interactive application layers without changing its composition. The earlier DOM implementation is preserved at `src/resilience/web/dom-console-v2.html`.
+
 ## V1 — Editorial globe concept
 
 - Status: **Selected dashboard design**
