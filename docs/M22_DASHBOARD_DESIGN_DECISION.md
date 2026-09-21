@@ -27,3 +27,5 @@ V1.3 establishes the enterprise boundary visually:
 External shocks propagate through the internal enterprise condition before changing the resilience outcome. Management interventions can act on either layer but remain simulation-only within this interface.
 
 V1.4 explored a multizone core heat map and is retained as superseded history. V1.5 establishes the approved single-state model: the Probability × Impact matrix and Enterprise Core represent the same consolidated condition, with one active matrix colour and one matching uniform core colour. The detailed rules are defined in [M22 Enterprise Core Temperature Behaviour](M22_CORE_TEMPERATURE_BEHAVIOR.md).
+
+V1.6 refines this model. The separate core-temperature panel is removed because the matrix already communicates the state. Both matrix-circle area and colour intensity increase with the Probability × Impact product, using a continuous pale-yellow-to-deep-orange palette. The core uses the exact colour of the active matrix point.

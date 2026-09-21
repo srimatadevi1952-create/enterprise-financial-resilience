@@ -1,76 +1,83 @@
 # M22 Enterprise Core Temperature Behaviour
 
-**Visual foundation:** `m22-console-editorial-concept-v1.5-single-state-core-temperature`
+**Visual foundation:** `m22-console-editorial-concept-v1.6-unified-matrix-core-gradient`
 
-**Purpose:** Present the enterprise's consolidated Probability × Impact condition as one colour state on the Enterprise Core.
+**Purpose:** Make the Probability × Impact matrix and Enterprise Core two synchronized representations of the same consolidated state.
 
-## Single-state principle
+## Unified representation
 
-The Probability × Impact matrix and the Enterprise Core show the same calculated state through two different representations:
+The matrix is the analytical representation. The core is the immediate visual representation. A separate core-temperature panel is unnecessary and must not be displayed.
 
-- the matrix shows the state's analytical position;
-- the core shows the state's immediate visual temperature.
+At time `t`:
 
-The core displays exactly one state and one colour at a time. It never shows simultaneous multicolour zones.
+`risk_score(t) = probability(t) × impact(t)`
 
-`core_temperature(t) = aggregate_probability(t) × aggregate_impact(t)`
+Probability and impact each use a continuous scale from `0` to `10`; the resulting score ranges from `0` to `100`. The active matrix point and the entire textured Enterprise Core always use the same colour derived from this score.
 
-The aggregation method and threshold version must be visible and recorded with the simulation run.
+## Matrix construction
 
-## Shared colour tokens
+The matrix uses Probability on the horizontal axis and Impact on the vertical axis. Both axes progress from Low through Medium to High and represent the continuous `0–10` domain.
 
-| State | Matrix dot | Enterprise Core |
-|---|---|---|
-| Low | Restrained teal | Uniform restrained teal texture |
-| Medium | Muted amber | Uniform muted amber texture |
-| High | Burnt orange | Uniform burnt-orange texture |
-| Stable / no active risk | Graphite | Uniform graphite texture |
+The nine displayed points provide representative combinations:
 
-The active matrix dot carries a visible selection ring. Its colour must exactly match the core. Tonal variation is allowed only for spherical light, shadow and material texture; it cannot introduce another state colour.
+| Impact \ Probability | Low | Medium | High |
+|---|---|---|---|
+| High | Low × High | Medium × High | High × High |
+| Medium | Low × Medium | Medium × Medium | High × Medium |
+| Low | Low × Low | Medium × Low | High × Low |
 
-Colour is supported by the state name, numeric Probability × Impact score, selection ring and optional texture pattern so meaning is not dependent on colour perception.
+Symmetric products, such as Low × High and High × Low, must use equal size and equal shade.
+
+## Size encoding
+
+Circle area represents the combined Probability × Impact score. Because viewers perceive area rather than diameter, the radius uses square-root scaling:
+
+`radius = minimum_radius + size_range × sqrt(risk_score / 100)`
+
+The minimum radius keeps the `0,0` state discoverable. The maximum circle must remain inside its grid cell. The selection ring does not count toward encoded size.
+
+## Colour encoding
+
+The matrix uses one sequential palette only:
+
+- minimum: very pale yellow;
+- low: warm yellow;
+- medium: golden amber;
+- elevated: light to medium orange;
+- maximum: deep burnt orange.
+
+Colour is interpolated continuously from the normalized score. Teal, green, blue, grey and red are not used for Probability × Impact points. The active point has a fine selection ring, and the Enterprise Core uses its exact colour.
+
+Tonal variation on the core is permitted only for spherical lighting and surface texture. It cannot introduce another state colour.
 
 ## Dynamic behaviour
 
-- Changing manipulated variables updates a preview matrix position and preview core temperature together.
-- `APPLY TO DRAFT` stores the proposed state without running the simulation.
-- `RUN` updates both representations at every simulation time step.
-- `PAUSE` freezes the matrix and core at the same time step.
-- Timeline scrubbing reconstructs the matched matrix position and core colour.
-- Recovery moves the state through the defined bands, for example High → Medium → Low → Stable.
-- Transitions are restrained and honour reduced-motion settings.
+- Manipulated-variable changes move the preview point and recolour the preview core together.
+- `APPLY TO DRAFT` stores the proposed position without running the simulation.
+- `RUN` updates point position, point size, point shade and core colour at each time step.
+- `PAUSE` freezes both representations at the same time step.
+- Timeline scrubbing reconstructs the synchronized state.
+- Recovery causes the point to move toward the matrix origin while its circle becomes smaller and paler; the core changes to the identical shade.
+- Transitions remain restrained and respect reduced-motion preferences.
 
-The matrix and core must never disagree. If either representation cannot be calculated, both display `STATE UNAVAILABLE` rather than showing stale or contradictory values.
+The matrix and core must never disagree. If either cannot be calculated, both show `STATE UNAVAILABLE` rather than retaining stale values.
 
-## Detail and causality
+## Detail and accessibility
 
-The single core temperature is an enterprise-level summary. Detail remains available through the six controls, parameter decks, orbit connectors, BowTie diagram, trends and evidence views.
+Selecting the active point or core reveals:
 
-Selecting the active matrix dot or the core reveals:
-
-- aggregate probability and impact;
-- active state and threshold;
+- Probability value from `0–10`;
+- Impact value from `0–10`;
+- calculated score from `0–100`;
 - contributing internal conditions and external forces;
 - dominant manipulated variables;
-- affected obligations, merchants, countries, corridors and systems;
 - confidence and data-quality grade;
 - Enterprise Resilience Index effect.
 
-## Aggregation
-
-The approved enterprise state can be calculated using a configured aggregation policy such as dominant risk, weighted portfolio score or board-approved composite. Only one policy is active for a run. The interface identifies that policy and provides drill-down to its components without rendering multiple colours on the core.
+Colour and size are supported by numeric values, axis position, focus treatment and an accessible state description.
 
 ## Evidence and audit
 
-Every state change records:
+Every change records the scenario, run, time step, probability, impact, score, circle radius, colour value, active cell, aggregation method, contributing variables, evidence, confidence and palette version.
 
-- scenario, run and time-step identifiers;
-- aggregate probability, aggregate impact and product;
-- aggregation method;
-- threshold and colour-token version;
-- active matrix cell;
-- core state and colour token;
-- contributing risks, variables and evidence;
-- confidence and data-quality grade.
-
-The core temperature is a read-only result. Selecting or recolouring the core cannot modify the simulation.
+The core colour is a read-only simulation result. Selecting or recolouring the core cannot modify the scenario.

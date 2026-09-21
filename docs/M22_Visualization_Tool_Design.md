@@ -28,7 +28,7 @@ The main view is a 3D enterprise network. The enterprise is central, with mercha
 
 The orbital model distinguishes two domains. The inner-enterprise ring contains Capital, Liquidity and Operations. The external-environment ring contains Regulation, Merchants and Countries & Corridors. Connections show how external shocks propagate into internal conditions and ultimately change the Enterprise Resilience Index. A visual legend differentiates internal conditions, external forces, management interventions and calculated outcomes.
 
-The Probability × Impact matrix and Enterprise Core are two representations of the same consolidated state. The active matrix dot and the entire textured core use one matching colour at a time: graphite for stable, teal for low, amber for medium or burnt orange for high. The paired state evolves during timeline playback and follows [M22 Enterprise Core Temperature Behaviour](M22_CORE_TEMPERATURE_BEHAVIOR.md).
+The Probability × Impact matrix and Enterprise Core are two representations of the same consolidated state. Matrix-circle area and a continuous pale-yellow-to-deep-orange colour gradient increase with the `0–10 × 0–10` product. The active matrix point and the entire textured core use the same colour. No separate temperature panel is displayed. The paired state evolves during timeline playback and follows [M22 Enterprise Core Temperature Behaviour](M22_CORE_TEMPERATURE_BEHAVIOR.md).
 
 The 3D scene is an explanatory network, not a geographic claim. A separate geographic view uses country and corridor geometry when location matters.
 
