@@ -1,10 +1,10 @@
 # M22 Control Popup UX/UI Design
 
-**Production foundation:** `m22-console-editorial-concept-v1.7-bowtie-active-severity`
+**Production foundation:** `m22-console-editorial-concept-v1.8-stable-baseline`
 
 **Purpose:** Provide direct manipulation of the 220 simulation variables through six channel-specific parameter decks.
 
-The concept images below were composed on V1.2 and remain valid for popup layout and interaction. The production implementation uses the V1.7 inner-enterprise, external-environment, unified matrix-core gradient and BowTie active-severity model beneath the same decks.
+The concept images below were composed on V1.2 and remain valid for popup layout and interaction. The production implementation uses the V1.8 stable graphite baseline, unified matrix-core gradient and BowTie active-severity model beneath the same decks.
 
 ## Interaction model
 

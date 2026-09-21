@@ -5,7 +5,8 @@ Both design directions are retained in the repository. The selected dashboard di
 ## V1 — Editorial globe concept
 
 - Status: **Selected dashboard design**
-- Current artifact: [`assets/m22-console-editorial-concept-v1.7-bowtie-active-severity.png`](assets/m22-console-editorial-concept-v1.7-bowtie-active-severity.png)
+- Current artifact: [`assets/m22-console-editorial-concept-v1.8-stable-baseline.png`](assets/m22-console-editorial-concept-v1.8-stable-baseline.png)
+- Active-stress example: [`assets/m22-console-editorial-concept-v1.7-bowtie-active-severity.png`](assets/m22-console-editorial-concept-v1.7-bowtie-active-severity.png)
 - Previous revision: [`assets/m22-console-editorial-concept-v1.6-unified-matrix-core-gradient.png`](assets/m22-console-editorial-concept-v1.6-unified-matrix-core-gradient.png)
 - Previous revision: [`assets/m22-console-editorial-concept-v1.5-single-state-core-temperature.png`](assets/m22-console-editorial-concept-v1.5-single-state-core-temperature.png)
 - Previous revision: [`assets/m22-console-editorial-concept-v1.4-core-heatmap.png`](assets/m22-console-editorial-concept-v1.4-core-heatmap.png)
@@ -22,6 +23,7 @@ Both design directions are retained in the repository. The selected dashboard di
 - Revision V1.5 supersedes the V1.4 multizone treatment. The matrix and Enterprise Core now show the same consolidated Probability × Impact state: one active matrix colour and one matching uniform core colour at any time.
 - Revision V1.6 removes the redundant core-temperature panel. Matrix-circle area and a continuous pale-yellow-to-deep-orange gradient both encode the `0–10 × 0–10` Probability × Impact product; the core uses the exact colour of the active matrix point.
 - Revision V1.7 applies the shared severity palette to the Payment Disruption BowTie. Inactive attributes and paths remain black; only active elements change from pale yellow to deep orange according to their individual severity.
+- Revision V1.8 establishes the stable baseline: at `0,0`, the core returns to its original graphite appearance, the matrix shows a graphite origin marker and all Payment Disruption attributes are inactive black. Risk colour begins only above zero.
 
 ## V2 — Interactive world-map console
 

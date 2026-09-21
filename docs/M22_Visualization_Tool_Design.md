@@ -30,6 +30,8 @@ The orbital model distinguishes two domains. The inner-enterprise ring contains 
 
 The Probability × Impact matrix and Enterprise Core are two representations of the same consolidated state. Matrix-circle area and a continuous pale-yellow-to-deep-orange colour gradient increase with the `0–10 × 0–10` product. The active matrix point and the entire textured core use the same colour. No separate temperature panel is displayed. The paired state evolves during timeline playback and follows [M22 Enterprise Core Temperature Behaviour](M22_CORE_TEMPERATURE_BEHAVIOR.md).
 
+At the stable `0,0` state, the matrix uses a graphite origin marker and the Enterprise Core retains its original graphite texture. The risk gradient begins only above zero. Returning to stability restores the neutral graphite state.
+
 The 3D scene is an explanatory network, not a geographic claim. A separate geographic view uses country and corridor geometry when location matters.
 
 ## Risk visualization surfaces

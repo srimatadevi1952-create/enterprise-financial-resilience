@@ -31,3 +31,5 @@ V1.4 explored a multizone core heat map and is retained as superseded history. V
 V1.6 refines this model. The separate core-temperature panel is removed because the matrix already communicates the state. Both matrix-circle area and colour intensity increase with the Probability × Impact product, using a continuous pale-yellow-to-deep-orange palette. The core uses the exact colour of the active matrix point.
 
 V1.7 establishes the BowTie state rule: inactive Payment Disruption attributes and paths stay black, while active threats, consequences and path segments use the shared yellow-to-orange palette according to each attribute's severity. Node size and path geometry remain fixed. See [M22 Payment Disruption BowTie Behaviour](M22_PAYMENT_DISRUPTION_BOWTIE_BEHAVIOR.md).
+
+V1.8 establishes graphite as the stable baseline. When Probability × Impact is exactly `0,0`, the Enterprise Core uses its original graphite texture and the matrix shows a selected graphite origin marker. Pale yellow begins only when risk rises above zero; increasing severity then progresses toward deep orange. Returning to zero restores graphite.

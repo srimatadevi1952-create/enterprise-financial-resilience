@@ -12,7 +12,7 @@ At time `t`:
 
 `risk_score(t) = probability(t) × impact(t)`
 
-Probability and impact each use a continuous scale from `0` to `10`; the resulting score ranges from `0` to `100`. The active matrix point and the entire textured Enterprise Core always use the same colour derived from this score.
+Probability and impact each use a continuous scale from `0` to `10`; the resulting score ranges from `0` to `100`. The active matrix point and the entire textured Enterprise Core always use the same colour derived from this score. A score of exactly `0` is the stable baseline and uses the core's original graphite appearance.
 
 ## Matrix construction
 
@@ -34,19 +34,20 @@ Circle area represents the combined Probability × Impact score. Because viewers
 
 `radius = minimum_radius + size_range × sqrt(risk_score / 100)`
 
-The minimum radius keeps the `0,0` state discoverable. The maximum circle must remain inside its grid cell. The selection ring does not count toward encoded size.
+The stable `0,0` state uses a small graphite origin marker and selection ring. The maximum circle must remain inside its grid cell. The selection ring does not count toward encoded size.
 
 ## Colour encoding
 
-The matrix uses one sequential palette only:
+Risk scores above zero use one sequential palette only:
 
+- stable `0,0`: original graphite;
 - minimum: very pale yellow;
 - low: warm yellow;
 - medium: golden amber;
 - elevated: light to medium orange;
 - maximum: deep burnt orange.
 
-Colour is interpolated continuously from the normalized score. Teal, green, blue, grey and red are not used for Probability × Impact points. The active point has a fine selection ring, and the Enterprise Core uses its exact colour.
+For scores above zero, colour is interpolated continuously from the normalized score. Teal, green, blue, grey and red are not used for Probability × Impact risk points. The stable origin marker is graphite. The active point has a fine selection ring, and the Enterprise Core uses its exact colour or returns to its original graphite texture at `0,0`.
 
 Tonal variation on the core is permitted only for spherical lighting and surface texture. It cannot introduce another state colour.
 
@@ -57,7 +58,7 @@ Tonal variation on the core is permitted only for spherical lighting and surface
 - `RUN` updates point position, point size, point shade and core colour at each time step.
 - `PAUSE` freezes both representations at the same time step.
 - Timeline scrubbing reconstructs the synchronized state.
-- Recovery causes the point to move toward the matrix origin while its circle becomes smaller and paler; the core changes to the identical shade.
+- Recovery causes the point to move toward the matrix origin while its circle becomes smaller and paler; at `0,0` the marker and core return to graphite.
 - Transitions remain restrained and respect reduced-motion preferences.
 
 The matrix and core must never disagree. If either cannot be calculated, both show `STATE UNAVAILABLE` rather than retaining stale values.
