@@ -1,10 +1,10 @@
 # M23 to M27 Operational Assurance Roadmap
 
-This roadmap converts the practical recommendations in `Review and Suggestions.docx` into an implementation sequence. It extends the completed M0 to M21 engine foundation and the M22 operating console without weakening the separation between Live Monitor and the private Simulation Lab.
+This roadmap converts the practical recommendations in `Review and Suggestions.docx` into an implementation sequence. It extends the completed M0 to M21 engine foundation and the M22 operating console without weakening the separation between Live Monitor and the private Simulation Lab. The existing enterprise-operated system is preserved as Model 1. M24 onward also introduces Model 2, a consultant-operated managed service, as defined in [Dual Operating Model Architecture](DUAL_OPERATING_MODEL_ARCHITECTURE.md).
 
 ## Existing foundation
 
-The current system already provides tenant isolation, scenario branches, evidence references, data-quality states, intervention approvals, decision records, feed-quality incidents, alert routing, shadow-run controls and an interactive console. The remaining work is to make these controls configurable for each enterprise and usable in everyday advisory and assurance work.
+The current system already provides tenant isolation, scenario branches, evidence references, data-quality states, intervention approvals, decision records, feed-quality incidents, alert routing, shadow-run controls and an interactive console. Model 1 retains these capabilities for direct operation by an enterprise. Model 2 adds a separate consultant control centre, online client-data acquisition, expert assessment, client approval and tightly governed implementation support without altering the Model 1 experience.
 
 ## M23 Enterprise Configuration and Process Risk Model
 
@@ -39,46 +39,61 @@ Represent how each client enterprise actually operates so that risk analysis, mo
 - Invalid, incomplete or conflicting configurations fail validation before activation.
 - Existing M0 to M22 regression checks continue to pass.
 
-## M24 Change Governance and Impact Simulation
+## M24 Consultant Workbench, Change Governance and Impact Simulation
 
 ### Objective
 
-Create a governed lifecycle for changes to enterprise processes, controls, configurations and operating assumptions.
+Preserve the enterprise-operated workflow while adding a consultant workbench that can receive authorised client observations, identify changes, apply expert judgement, simulate responses and submit governed recommendations to the client.
 
 ### Scope
 
-- Change request containing the original state, proposed state, reason, owner, affected processes and supporting evidence.
+- Explicit operating-model and client-tenant context for every case and session.
+- Consultant assignment, service mandate, permitted purpose, authority scope and expiry.
+- Read-only online source observations with lineage, quality results and reconciliation status.
+- Detected-change facts compared with the approved M23 configuration and prior client state.
+- Consultant assessment containing the original state, proposed state, reason, affected processes, professional rationale and supporting evidence.
 - Impact assessment across capital, liquidity, operations, regulation, merchants and corridors.
 - Private what-if simulation of the proposed change before approval.
-- Segregated request, review, approval, implementation and validation roles.
+- Segregated consultant, client reviewer, client approver, implementation and validation roles.
 - Decision history, comments, conditions, implementation evidence and rollback plan.
+- Advisory, assisted and delegated implementation modes.
+- Controlled execution package proven through a sandbox adapter; no production connector is enabled in M24.
 - Post-implementation comparison between expected and observed effects.
 
 ### Deliverables
 
-- Change register and immutable change-event history.
+- Consultant portfolio work queue and tenant-safe case workspace.
+- Source-observation, change register and immutable change-event history.
+- Expert assessment and recommendation record.
 - Impact-analysis service connected to the M22 Simulation Lab.
-- Approval workflow and role-entitlement model.
+- Client approval, mandate and role-entitlement model.
+- Execution package, preflight and sandbox-orchestration contract.
 - Change comparison and post-implementation review views.
 - Audit export containing the proposal, evidence, approvals, simulation and outcome.
 
 ### Acceptance criteria
 
-- A user can trace an approved change from the original state through simulation, approval, implementation evidence and final validation.
+- Model 1 continues to operate without requiring a consultant or exposing consultant-only functions.
+- A consultant sees and operates only the client tenants explicitly assigned under a current mandate.
+- Every extracted observation is read-only and traceable to its authorised source, collection time and transformation history.
+- A detected change requires recorded expert acceptance or dismissal before it becomes a recommendation.
+- A user can trace an approved change from the original state through expert assessment, simulation, client approval, implementation evidence and final validation.
 - No proposed or simulated change can alter Live Monitor data or initiate a financial action.
 - Approval rules prevent self-approval where segregation of duties is required.
+- Delegated execution is blocked without an active mandate, approved action scope and successful preflight; M24 execution affects only its sandbox adapter.
 - Rejected, withdrawn and rolled-back changes remain preserved and searchable.
 - The expected impact can be compared with the observed outcome using the same metrics and evidence lineage.
 
-## M25 Client Information Obligations and Evidence Confidence
+## M25 Online Client Information Obligations and Evidence Confidence
 
 ### Objective
 
-Manage missing, delayed, incomplete and unreliable client information while showing how evidence quality affects the reliability of each risk assessment.
+Manage authorised online inputs and missing, delayed, incomplete or unreliable client information while showing how evidence quality affects each consultant and enterprise risk assessment.
 
 ### Scope
 
 - Information-obligation register for documents, confirmations, filings and recurring data submissions.
+- Connector and source register covering authorisation, purpose, scope, schedule, owner, credentials reference and revocation status.
 - Responsible client contact, internal owner, due date, recurrence, jurisdiction and regulatory dependency.
 - Request, receipt, validation, rejection, overdue and waiver states.
 - Reminder and escalation policies with full communication-event history.
@@ -92,11 +107,11 @@ Manage missing, delayed, incomplete and unreliable client information while show
 - Reminder, escalation and service-level timer service.
 - Evidence-confidence calculation with versioned rules.
 - Missing-information impact service connected to classifications, alerts and board intelligence.
-- Client and adviser work queues plus dashboard indicators.
+- Client, enterprise-user and consultant work queues plus dashboard indicators.
 
 ### Acceptance criteria
 
-- Every required item has an owner, due date, current state, evidence link and escalation history.
+- Every required item and online source has an owner, authority basis, current state, evidence link and escalation history.
 - Reminders and escalations are deterministic, configurable and protected from duplicate delivery.
 - Risk severity and assessment confidence are stored and displayed as separate measures.
 - Missing information reduces confidence only according to explicit rules; it raises risk severity only when a defined exposure or obligation is affected.
@@ -133,31 +148,37 @@ Convert completed cases, simulations, interventions and changes into governed in
 - Superseded or withdrawn lessons remain auditable and cannot be presented as current guidance.
 - Suggested cases are advisory and never change a simulation or live decision automatically.
 
-## M27 Operational Assurance Console and Controlled Pilot
+## M27 Dual-Model Operational Assurance Console and Controlled Pilot
 
 ### Objective
 
-Integrate M23 to M26 into the approved M22 visual language and prove the complete workflow with a controlled multi-role pilot.
+Integrate M23 to M26 into the approved M22 visual language and prove both the preserved enterprise-operated model and the consultant-operated service with controlled multi-role pilots.
 
 ### Scope
 
 - Draggable panels for enterprise configuration, changes, information obligations and lessons learned.
+- Consultant control centre with assigned-client portfolio, work queue, tenant switch and mandate status.
+- Client portal for evidence requests, recommendations, decisions, authority and revocation.
 - Live Monitor indicators for overdue obligations, open changes, evidence confidence and relevant alerts.
 - Simulation Lab links from proposed changes and missing-information conditions.
-- Role-specific views for client, adviser, analyst, approver, executive and auditor.
+- Role-specific views for enterprise user, consultant, client decision-maker, implementation operator, executive and auditor.
 - End-to-end notifications, audit evidence and executive reporting.
 - Accessibility, performance, security and cross-tenant isolation validation.
 
 ### Deliverables
 
-- Integrated Operational Assurance workspace in the M22 console.
-- End-to-end pilot fixture covering a process change, delayed evidence, escalation, simulation, approval, implementation review and captured lesson.
+- Integrated Model 1 Operational Assurance workspace in the M22 console.
+- Integrated Model 2 consultant control centre and client approval portal.
+- Enterprise-operated pilot fixture covering a process change, delayed evidence, escalation, simulation, approval, implementation review and captured lesson.
+- Consultant-operated pilot fixture covering authorised online extraction, detected change, expert assessment, simulation, recommendation, client approval, sandbox delegated action, post-change validation and captured lesson.
 - Operator guide, control catalogue and pilot evidence pack.
 - Readiness report with defects, decisions and recommended production boundary.
 
 ### Acceptance criteria
 
-- The pilot completes the full workflow without changing the immutable live baseline or initiating a financial action.
+- Model 1 remains usable as a complete standalone enterprise system.
+- The consultant pilot completes the full service workflow without cross-client exposure or direct action from the visualization or simulation layers.
+- Only the separately governed sandbox execution adapter can receive the pilot's delegated action.
 - Each dashboard state traces to source evidence, configuration version and responsible owner.
 - Authorisation and segregation-of-duty checks pass for every role transition.
 - Users can distinguish exposure severity, evidence confidence, workflow status and calculated resilience outcome.
@@ -166,13 +187,14 @@ Integrate M23 to M26 into the approved M22 visual language and prove the complet
 
 ## Delivery order and dependencies
 
-M23 comes first because all later workflows require a reliable enterprise and process model. M24 follows so proposed configuration and process changes are governed and can be simulated. M25 then adds client information obligations and confidence-aware risk results. M26 uses the structured context and completed workflow evidence from M23 to M25. M27 integrates the four capabilities and validates them together.
+M23 comes first because both operating models require a reliable enterprise and process model. M24 preserves Model 1 and adds the consultant workbench, mandates and governed change lifecycle. M25 adds authorised online-source governance, client information obligations and confidence-aware risk results. M26 uses the structured context and completed workflow evidence from M23 to M25. M27 integrates the capabilities and validates each model separately and together.
 
 ## Cross-cutting controls
 
 All five milestones must preserve:
 
 - tenant isolation and least-privilege access;
+- explicit operating-model, tenant, consultant assignment and client-mandate context;
 - immutable baselines and versioned records;
 - explicit actor, time, reason and evidence attribution;
 - separation of risk severity, evidence confidence and resilience outcome;
@@ -183,4 +205,4 @@ All five milestones must preserve:
 
 ## Definition of completion
 
-The operational assurance programme is complete when an authorised team can configure an enterprise, identify an information gap, govern and simulate a proposed response, obtain approval, observe the result, capture the lesson and reproduce the complete decision trail without affecting live financial operations.
+The operational assurance programme is complete when an enterprise can use Model 1 independently and an authorised consultant can use Model 2 to receive approved client inputs, assess a detected change, simulate and recommend a response, obtain client approval, support or perform an authorised action through the separate execution boundary, validate the result, capture the lesson and reproduce the complete decision trail without allowing the visualization or simulation layers to affect live financial operations.

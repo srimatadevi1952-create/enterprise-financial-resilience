@@ -16,9 +16,11 @@ M5 now records run manifests, intervention approvals, replay keys, decision reco
 
 M22 now includes a working Canvas-rendered console that uses the approved editorial artwork as its pixel-accurate master surface. It scales as one instrument panel without reflow or scrolling. Live Monitor is immutable; an entitled user can create an isolated private Simulation Lab, manipulate the six control groups backed by the 220-variable register, run a what-if scenario, return to the unchanged live state, and invite scoped collaborators. The earlier DOM/HTML implementation is retained at `/dom-console-v2.html` for reference.
 
-The next planned delivery sequence is [M23 to M27 Operational Assurance](docs/M23_M27_Operational_Assurance_Roadmap.md): enterprise configuration, change governance, client information obligations and evidence confidence, lessons learned and case intelligence, followed by integrated console validation and a controlled pilot.
+The platform now has a defined [Dual Operating Model Architecture](docs/DUAL_OPERATING_MODEL_ARCHITECTURE.md). Model 1 preserves the enterprise-operated system and approved M22 console. Model 2 adds a separate consultant-operated managed service for authorised online data collection, expert assessment, simulation, client approval and controlled implementation support.
 
-M23 is complete. Its implementation and validation evidence are recorded in the [M23 Completion Report](docs/M23_Completion_Report.md). The next implementation milestone is M24 Change Governance and Impact Simulation.
+The next planned delivery sequence is [M23 to M27 Operational Assurance](docs/M23_M27_Operational_Assurance_Roadmap.md): enterprise configuration, consultant workbench and change governance, online client information obligations and evidence confidence, lessons learned and case intelligence, followed by dual-model console validation and controlled pilots.
+
+M23 is complete. Its implementation and validation evidence are recorded in the [M23 Completion Report](docs/M23_Completion_Report.md). The next implementation milestone is M24 Consultant Workbench, Change Governance and Impact Simulation. M24 extends the platform without replacing or modifying the independent Model 1 operating path.
 
 ## Open the integrated console
 
