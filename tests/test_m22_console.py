@@ -52,3 +52,9 @@ def test_canvas_console_packages_the_approved_master_and_preserves_dom_version()
     assert "const DESIGN={w:1881,h:1073}" in index
     assert (web / "m22-console-canvas-master-v2.png").stat().st_size > 100_000
     assert (web / "dom-console-v2.html").exists()
+
+
+def test_console_route_accepts_accidental_markdown_wildcard_suffix():
+    source = (ROOT / "src" / "resilience" / "m22_web.py").read_text(encoding="utf-8")
+    assert '"/**"' in source
+    assert "unquote(urlparse(self.path).path)" in source

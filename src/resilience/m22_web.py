@@ -7,7 +7,7 @@ import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from .config import ROOT
 from .m22_console import ConsoleAuthorizationError, ConsoleService, Principal, group_variable_register
@@ -34,7 +34,7 @@ def make_handler(application: ConsoleApplication):
         server_version = "EFRConsole/0.1"
 
         def do_GET(self):
-            path = urlparse(self.path).path
+            path = unquote(urlparse(self.path).path)
             if path == "/api/bootstrap":
                 principal = self._principal()
                 self._json({
@@ -57,7 +57,7 @@ def make_handler(application: ConsoleApplication):
                 self._file(WEB_ROOT / path.removeprefix("/web-assets/"))
             elif path == "/dom-console-v2.html":
                 self._file(WEB_ROOT / "dom-console-v2.html")
-            elif path in {"/", "/index.html"}:
+            elif path in {"/", "/index.html", "/*", "/**"}:
                 self._file(WEB_ROOT / "index.html")
             else:
                 self.send_error(HTTPStatus.NOT_FOUND)
