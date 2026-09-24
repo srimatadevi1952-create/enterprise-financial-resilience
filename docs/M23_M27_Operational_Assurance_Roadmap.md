@@ -41,6 +41,8 @@ Represent how each client enterprise actually operates so that risk analysis, mo
 
 ## M24 Consultant Workbench, Change Governance and Impact Simulation
 
+Status: Complete on 24 September 2026. See [M24 Completion Report](M24_Completion_Report.md).
+
 ### Objective
 
 Preserve the enterprise-operated workflow while adding a consultant workbench that can receive authorised client observations, identify changes, apply expert judgement, simulate responses and submit governed recommendations to the client.
