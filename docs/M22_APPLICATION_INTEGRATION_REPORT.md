@@ -5,7 +5,7 @@
 
 ## Integrated application slice
 
-The approved editorial console is now implemented as a working Canvas application inside the V2 Python application. The approved 1881 × 1073 artwork is the rendering master, so the full console scales as one coordinated surface without HTML reflow or page scrolling. It is served by `resilience.m22_web`, uses the M22 220-variable register, and delegates authorization, session isolation, scenario calculation and collaboration rules to the testable `resilience.m22_console` service. The earlier DOM implementation remains preserved as `dom-console-v2.html`.
+The approved editorial console is now implemented as a layered graphics application inside the V2 Python application. The approved 1881 × 1073 artwork is displayed directly as the visible image layer; it is not redrawn by HTML or Canvas. A transparent Canvas above it supplies hit testing, authorization panels, parameter decks and dynamic simulation results. This preserves the reference artwork while the full console scales as one coordinated surface without HTML reflow or page scrolling. It is served by `resilience.m22_web`, uses the M22 220-variable register, and delegates authorization, session isolation, scenario calculation and collaboration rules to the testable `resilience.m22_console` service. The earlier DOM implementation remains preserved as `dom-console-v2.html`.
 
 The initial application supports:
 
