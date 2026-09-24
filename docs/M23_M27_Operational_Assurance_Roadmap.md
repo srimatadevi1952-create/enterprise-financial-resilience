@@ -8,6 +8,8 @@ The current system already provides tenant isolation, scenario branches, evidenc
 
 ## M23 Enterprise Configuration and Process Risk Model
 
+Status: Complete on 24 September 2026. See [M23 Completion Report](M23_Completion_Report.md).
+
 ### Objective
 
 Represent how each client enterprise actually operates so that risk analysis, monitoring and simulation use organisation-specific processes, responsibilities, controls and thresholds.

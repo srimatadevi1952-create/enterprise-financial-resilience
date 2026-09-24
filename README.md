@@ -7,7 +7,7 @@ M0 foundation established 19 September 2026. This is an isolated new codebase; i
 - Python 3.12.14 virtual environment and pinned dependencies.
 - PostgreSQL 15.19 container `efrco-v2-postgres-20260919`, bound only to `127.0.0.1:56432`, with persistent volume `efrco-v2-data-20260919`.
 - Separate databases `efrco_v2_dev` and `efrco_v2_test`, with separate runtime and migration roles.
-- M21 migration `m21_0024`; read-only shadow executions, observations, reconciliation, and live-action zero checks are available for isolated tests. No recovered V1 populations are imported.
+- M23 migration `m23_0027`; versioned enterprise configurations, entities, processes, risks, controls and dependencies are available with effective-date resolution, immutable history and tenant isolation. No recovered V1 populations are imported.
 - Guarded read-only `doctor` command and isolation tests.
 - Runtime roles can read the identity/version tables but cannot alter, update or truncate them; test roles cannot connect to development.
 - M0 completion evidence is in the parent [M0 Completion Report](../M0_Completion_Report.md).
@@ -17,6 +17,8 @@ M5 now records run manifests, intervention approvals, replay keys, decision reco
 M22 now includes a working Canvas-rendered console that uses the approved editorial artwork as its pixel-accurate master surface. It scales as one instrument panel without reflow or scrolling. Live Monitor is immutable; an entitled user can create an isolated private Simulation Lab, manipulate the six control groups backed by the 220-variable register, run a what-if scenario, return to the unchanged live state, and invite scoped collaborators. The earlier DOM/HTML implementation is retained at `/dom-console-v2.html` for reference.
 
 The next planned delivery sequence is [M23 to M27 Operational Assurance](docs/M23_M27_Operational_Assurance_Roadmap.md): enterprise configuration, change governance, client information obligations and evidence confidence, lessons learned and case intelligence, followed by integrated console validation and a controlled pilot.
+
+M23 is complete. Its implementation and validation evidence are recorded in the [M23 Completion Report](docs/M23_Completion_Report.md). The next implementation milestone is M24 Change Governance and Impact Simulation.
 
 ## Open the integrated console
 
