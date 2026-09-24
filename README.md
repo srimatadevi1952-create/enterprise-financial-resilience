@@ -16,6 +16,8 @@ M5 now records run manifests, intervention approvals, replay keys, decision reco
 
 M22 now includes a working Canvas-rendered console that uses the approved editorial artwork as its pixel-accurate master surface. It scales as one instrument panel without reflow or scrolling. Live Monitor is immutable; an entitled user can create an isolated private Simulation Lab, manipulate the six control groups backed by the 220-variable register, run a what-if scenario, return to the unchanged live state, and invite scoped collaborators. The earlier DOM/HTML implementation is retained at `/dom-console-v2.html` for reference.
 
+The next planned delivery sequence is [M23 to M27 Operational Assurance](docs/M23_M27_Operational_Assurance_Roadmap.md): enterprise configuration, change governance, client information obligations and evidence confidence, lessons learned and case intelligence, followed by integrated console validation and a controlled pilot.
+
 ## Open the integrated console
 
 The console is restricted to the local development profile and binds only to `127.0.0.1`:

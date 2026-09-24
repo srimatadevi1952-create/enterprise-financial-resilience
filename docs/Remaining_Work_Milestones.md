@@ -2,6 +2,8 @@
 
 This roadmap closes the gaps identified in `Risk_Analysis_Approach.docx` after M0–M13.
 
+M14 through M21 are now complete. The successor roadmap is [M23 to M27 Operational Assurance](M23_M27_Operational_Assurance_Roadmap.md). M22 is the operating-console layer connecting the completed engines to these next workflows.
+
 ## M14 Scale and Performance Hardening
 
 Build production-shaped synthetic populations and verify throughput, latency, indexing, partitioning, and long-duration runs.
