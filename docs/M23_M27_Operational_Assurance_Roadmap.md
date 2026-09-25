@@ -123,6 +123,8 @@ Manage authorised online inputs and missing, delayed, incomplete or unreliable c
 
 ## M26 Lessons Learned and Case Intelligence
 
+Status: Complete on 25 September 2026. See [M26 Completion Report](M26_Completion_Report.md).
+
 ### Objective
 
 Convert completed cases, simulations, interventions and changes into governed institutional knowledge that can assist future decisions.
