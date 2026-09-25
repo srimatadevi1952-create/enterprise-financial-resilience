@@ -88,6 +88,8 @@ Preserve the enterprise-operated workflow while adding a consultant workbench th
 
 ## M25 Online Client Information Obligations and Evidence Confidence
 
+Status: Complete on 25 September 2026. See [M25 Completion Report](M25_Completion_Report.md).
+
 ### Objective
 
 Manage authorised online inputs and missing, delayed, incomplete or unreliable client information while showing how evidence quality affects each consultant and enterprise risk assessment.

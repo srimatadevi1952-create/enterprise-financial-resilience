@@ -9,6 +9,7 @@ M0 foundation established 19 September 2026. This is an isolated new codebase; i
 - Separate databases `efrco_v2_dev` and `efrco_v2_test`, with separate runtime and migration roles.
 - M23 migrations through `m23_0027`; versioned enterprise configurations, entities, processes, risks, controls and dependencies are available with effective-date resolution, immutable history and tenant isolation. No recovered V1 populations are imported.
 - M24 migrations through `m24_0031`; consultant assignments, client authority, client mandates, read-only source observations, expert assessments, simulation-backed recommendations, independent client decisions, sandbox action packages and post-implementation reviews are available with tenant isolation and append-only evidence.
+- M25 migrations through `m25_0033`; authorised source registration, source-observation lineage, recurring information obligations, idempotent reminders and escalations, governed waivers, versioned evidence-confidence rules and executive evidence disclosures are available for both operating models.
 - Guarded read-only `doctor` command and isolation tests.
 - Runtime roles can read the identity/version tables but cannot alter, update or truncate them; test roles cannot connect to development.
 - M0 completion evidence is in the parent [M0 Completion Report](../M0_Completion_Report.md).
@@ -21,7 +22,7 @@ The platform now has a defined [Dual Operating Model Architecture](docs/DUAL_OPE
 
 The next planned delivery sequence is [M23 to M27 Operational Assurance](docs/M23_M27_Operational_Assurance_Roadmap.md): enterprise configuration, consultant workbench and change governance, online client information obligations and evidence confidence, lessons learned and case intelligence, followed by dual-model console validation and controlled pilots.
 
-M23 and M24 are complete. Their implementation and validation evidence are recorded in the [M23 Completion Report](docs/M23_Completion_Report.md) and [M24 Completion Report](docs/M24_Completion_Report.md). M24 extends the platform without replacing or modifying the independent Model 1 operating path. The next implementation milestone is M25 Online Client Information Obligations and Evidence Confidence.
+M23, M24 and M25 are complete. Their implementation and validation evidence are recorded in the [M23 Completion Report](docs/M23_Completion_Report.md), [M24 Completion Report](docs/M24_Completion_Report.md) and [M25 Completion Report](docs/M25_Completion_Report.md). The enterprise-operated Model 1 remains independent while Model 2 adds consultant-led service capabilities. The next implementation milestone is M26 Lessons Learned and Case Intelligence.
 
 ## Open the integrated console
 
