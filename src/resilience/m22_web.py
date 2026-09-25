@@ -7,24 +7,28 @@ import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from .config import ROOT
 from .m22_console import ConsoleAuthorizationError, ConsoleService, Principal, group_variable_register
+from .m27_assurance import OperationalAssuranceService
 
 
 WEB_ROOT = Path(__file__).with_name("web")
 ASSET_ROOT = ROOT / "docs" / "assets"
 
 PRINCIPALS = {
-    "analyst": Principal("analyst-1", "Asha Iyer", frozenset({"live:view", "simulation:create", "simulation:share"})),
+    "analyst": Principal("analyst-1", "Asha Iyer", frozenset({"live:view", "simulation:create", "simulation:share", "assurance:enterprise:view"})),
     "viewer": Principal("viewer-1", "Dev Rao", frozenset({"live:view"})),
+    "consultant": Principal("consultant-1", "Maya Sen", frozenset({"live:view", "simulation:create", "simulation:share", "assurance:enterprise:view", "assurance:consultant:view"})),
+    "client": Principal("client-1", "Arun Mehta", frozenset({"assurance:client:view"})),
 }
 
 
 class ConsoleApplication:
     def __init__(self):
         self.service = ConsoleService()
+        self.assurance = OperationalAssuranceService()
         with (ROOT / "config" / "m22_manipulated_variables.csv").open(encoding="utf-8-sig", newline="") as handle:
             self.variables = group_variable_register(csv.DictReader(handle))
 
@@ -35,6 +39,7 @@ def make_handler(application: ConsoleApplication):
 
         def do_GET(self):
             path = unquote(urlparse(self.path).path)
+            query = parse_qs(urlparse(self.path).query)
             if path == "/api/bootstrap":
                 principal = self._principal()
                 self._json({
@@ -45,6 +50,12 @@ def make_handler(application: ConsoleApplication):
                     "environment": "development",
                     "identity_adapter": "local-development",
                 })
+            elif path == "/api/operational-assurance/bootstrap":
+                try:
+                    view = query.get("view", ["enterprise"])[0]
+                    self._json(application.assurance.bootstrap(self._principal(), view))
+                except Exception as exc:
+                    self._error(exc)
             elif path.startswith("/api/simulation-sessions/"):
                 try:
                     session = application.service.get_session(self._principal(), path.rsplit("/", 1)[-1])

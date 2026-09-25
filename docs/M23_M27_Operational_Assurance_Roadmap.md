@@ -156,6 +156,8 @@ Convert completed cases, simulations, interventions and changes into governed in
 
 ## M27 Dual-Model Operational Assurance Console and Controlled Pilot
 
+Status: Complete on 25 September 2026. See [M27 Completion Report](M27_Completion_Report.md).
+
 ### Objective
 
 Integrate M23 to M26 into the approved M22 visual language and prove both the preserved enterprise-operated model and the consultant-operated service with controlled multi-role pilots.
