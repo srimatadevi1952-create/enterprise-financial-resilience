@@ -19,7 +19,7 @@ const app={
   variables:{},variableState:{},overlay:null,panel:null,drag:null,readOnly:false,
   preset:'base',playback:{period:0,running:false,timer:null},share:null,
   assurance:null,assuranceView:'enterprise',assurancePanel:null,assuranceDrag:null,
-  assuranceDetail:null,pendingAssuranceView:null,
+  assuranceDetail:null,pendingAssuranceView:null,scenarioResult:null,
 };
 
 const api=(path,options={},principal='analyst')=>fetch(path,{...options,headers:{
@@ -51,6 +51,7 @@ function draw(){
   if(app.overlay==='share')drawShare();
   if(app.overlay==='role-authorize')drawRoleAuthorization();
   if(app.overlay==='decision-authorize')drawDecisionAuthorization();
+  if(app.overlay==='scenario-result')drawScenarioResult();
   ctx.restore();
 }
 
@@ -104,7 +105,17 @@ function drawAuthorization(){
   button({x:x+38,y:y+h-72,w:220,h:42},'CANCEL');button({x:x+w-310,y:y+h-72,w:272,h:42},'ENTER SIMULATION LAB',true);
 }
 async function authorize(){try{app.session=await api('/api/simulation-sessions',{method:'POST',body:JSON.stringify({step_up_verified:true,purpose:'Enterprise stress and recovery analysis'})});app.state=structuredClone(app.session.state);initVariableState();app.mode='simulation';app.readOnly=false;app.overlay=null;applyPreset('base');announce('Private Simulation Lab created · live state unchanged')}catch(e){announce(e.message)}}
-async function run(){if(app.mode!=='simulation'){app.overlay='authorize';draw();return}if(app.readOnly){announce('Shared viewer is read only');return}try{syncAggregates();const data=await api(`/api/simulation-sessions/${app.session.session_id}/run`,{method:'POST',body:JSON.stringify({controls:app.state.controls})});app.state=data.state;app.playback.period=0;announce('Scenario calculated · press Play to inspect the timeline');draw()}catch(e){announce(e.message)}}
+async function run(){if(app.mode!=='simulation'){app.overlay='authorize';draw();return}if(app.readOnly){announce('Shared viewer is read only');return}try{syncAggregates();const data=await api(`/api/simulation-sessions/${app.session.session_id}/run`,{method:'POST',body:JSON.stringify({controls:app.state.controls})});app.state=data.state;app.scenarioResult=data.scenario;app.playback.period=0;app.overlay='scenario-result';announce('Scenario calculated · explanation and results available');draw()}catch(e){announce(e.message)}}
+
+function wrapped(text,x,y,maxWidth,lineHeight,maxLines=4){const words=String(text).split(/\s+/);let line='',lines=[];for(const word of words){const test=line?`${line} ${word}`:word;if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);lines.slice(0,maxLines).forEach((value,index)=>ctx.fillText(value,x,y+index*lineHeight))}
+function drawScenarioResult(){
+  ctx.fillStyle='rgba(15,14,12,.58)';ctx.fillRect(0,0,DESIGN.w,DESIGN.h);const x=483,y=170,w=915,h=730,s=app.scenarioResult;paper(.995);ctx.fillRect(x,y,w,h);ctx.strokeStyle='#24231f';ctx.lineWidth=2;ctx.strokeRect(x,y,w,h);ctx.fillStyle='#24231f';ctx.fillRect(x,y,w,72);ctx.fillStyle='#fff';setFont(21,'700');ctx.fillText('SCENARIO EXPLANATION & RESULT',x+30,y+27);setFont(10);ctx.fillText(`${s?.scenario_id||'PENDING'} · ${s?.model_version||'UNKNOWN MODEL'} · PRIVATE SIMULATION`,x+30,y+53);setFont(30);ctx.fillText('×',x+w-48,y+35);
+  ctx.fillStyle='#24231f';setFont(12,'700');ctx.fillText('SCENE',x+32,y+112);ctx.fillStyle='#716d65';setFont(13);wrapped(s?.explanation||'Scenario explanation unavailable.',x+32,y+144,w-64,24,4);
+  const r=s?.results||{};const cards=[['PROBABILITY',r.probability??'—','0–10'],['IMPACT',r.impact??'—','0–10'],['RESILIENCE',r.resilience??'—','0–100'],['CONDITION',String(r.payment_disruption||'—').toUpperCase(),'CALCULATED']];cards.forEach((card,i)=>{const cx=x+32+i*211,cy=y+255;ctx.fillStyle='#ebe7de';ctx.fillRect(cx,cy,195,105);ctx.strokeStyle='#aaa399';ctx.strokeRect(cx,cy,195,105);ctx.fillStyle=i===2?'#ed4b15':'#24231f';setFont(i===3?18:34,'700');ctx.fillText(String(card[1]),cx+16,cy+39);ctx.fillStyle='#24231f';setFont(10,'700');ctx.fillText(card[0],cx+16,cy+72);ctx.fillStyle='#716d65';setFont(9);ctx.fillText(card[2],cx+16,cy+92)});
+  ctx.fillStyle='#24231f';setFont(12,'700');ctx.fillText('CONNECTED PATHWAYS',x+32,y+405);ctx.fillStyle='#716d65';setFont(12);wrapped((s?.connected_pathways||[]).join('  ·  ')||'No connected pathway activated.',x+32,y+437,w-64,22,3);
+  ctx.strokeStyle='#aaa399';ctx.strokeRect(x+32,y+515,w-64,95);ctx.fillStyle='#24231f';setFont(11,'700');ctx.fillText('PRECEDENT SEARCH',x+50,y+542);setFont(13);ctx.fillText(String(s?.precedent_search||'PENDING').replaceAll('_',' '),x+250,y+542);setFont(11,'700');ctx.fillText('LESSON STATE',x+50,y+580);setFont(13);ctx.fillText(String(s?.lesson_state||'PENDING').replaceAll('_',' '),x+250,y+580);
+  ctx.fillStyle='#716d65';setFont(10);ctx.fillText('A precedent is advisory. Current-state validation, authority and rollback readiness remain mandatory.',x+32,y+644);button({x:x+w-206,y:y+h-61,w:174,h:36},'CLOSE',true);
+}
 
 function startPlayback(){if(!app.session||!app.state){announce('Calculate a scenario first');return}clearInterval(app.playback.timer);app.playback.running=true;app.playback.timer=setInterval(()=>{app.playback.period++;if(app.playback.period>=8){app.playback.period=8;pausePlayback();announce('Timeline complete')}draw()},650);announce('Scenario timeline playing');draw()}
 function pausePlayback(){clearInterval(app.playback.timer);app.playback.timer=null;app.playback.running=false;draw()}
@@ -156,6 +167,7 @@ canvas.addEventListener('pointerdown',async event=>{
   if(app.overlay==='authorize'){if(inside(p,{x:1028,y:716,w:272,h:42}))await authorize();else if(inside(p,{x:581,y:716,w:220,h:42})){app.overlay=null;draw()}return}
   if(app.overlay==='role-authorize'){if(inside(p,{x:1000,y:644,w:236,h:38})){const view=app.pendingAssuranceView;app.overlay=null;await loadAssurance(view)}else if(inside(p,{x:644,y:644,w:190,h:38})){app.overlay=null;draw()}return}
   if(app.overlay==='decision-authorize'){if(inside(p,{x:1000,y:644,w:236,h:38}))await recordDecision();else if(inside(p,{x:644,y:644,w:190,h:38})){app.overlay=null;draw()}return}
+  if(app.overlay==='scenario-result'){if(inside(p,{x:1192,y:839,w:174,h:36})||inside(p,{x:1338,y:170,w:60,h:72})){app.overlay=null;draw()}return}
   if(app.overlay==='share'){
     if(inside(p,{x:586,y:350,w:330,h:78}))window.open('https://meet.google.com/new','_blank','noopener');
     else if(inside(p,{x:965,y:350,w:330,h:78}))window.open('https://zoom.us/start/videomeeting','_blank','noopener');

@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, unquote, urlparse
 from .config import ROOT
 from .m22_console import ConsoleAuthorizationError, ConsoleService, Principal, group_variable_register
 from .m27_assurance import OperationalAssuranceService
+from .m28_scenario_intelligence import explain_console_scenario
 
 
 WEB_ROOT = Path(__file__).with_name("web")
@@ -49,6 +50,12 @@ def make_handler(application: ConsoleApplication):
                     "variables": application.variables,
                     "environment": "development",
                     "identity_adapter": "local-development",
+                    "model_profile": {
+                        "model_version": "DEFAULT-UAT-V1",
+                        "calibration_state": "DEFAULT_UNCALIBRATED",
+                        "enterprise_specific": False,
+                        "notice": "Connect approved enterprise history and activate an independently approved M28 calibration.",
+                    },
                 })
             elif path == "/api/operational-assurance/bootstrap":
                 try:
@@ -99,8 +106,10 @@ def make_handler(application: ConsoleApplication):
                     self._json(self._session_payload(session), HTTPStatus.CREATED)
                 elif path.endswith("/run") and path.startswith("/api/simulation-sessions/"):
                     session_id = path.split("/")[3]
+                    baseline = application.service.get_session(principal, session_id).state.as_dict()
                     state = application.service.run_scenario(principal, session_id, body.get("controls", {}))
-                    self._json({"state": state.as_dict(), "live_unchanged": True})
+                    result = state.as_dict()
+                    self._json({"state": result, "scenario": explain_console_scenario(baseline, result), "live_unchanged": True})
                 elif path.endswith("/invite") and path.startswith("/api/simulation-sessions/"):
                     session_id = path.split("/")[3]
                     invite = application.service.invite(principal, session_id, str(body.get("actor_id", "")), str(body.get("role", "")))
