@@ -16,7 +16,7 @@ resilience = "resilience.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-resilience = ["web/*.html", "web/*.png"]
+resilience = ["web/*.html", "web/*.js", "web/*.png"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

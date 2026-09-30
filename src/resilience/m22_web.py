@@ -21,14 +21,14 @@ PRINCIPALS = {
     "analyst": Principal("analyst-1", "Asha Iyer", frozenset({"live:view", "simulation:create", "simulation:share", "assurance:enterprise:view"})),
     "viewer": Principal("viewer-1", "Dev Rao", frozenset({"live:view"})),
     "consultant": Principal("consultant-1", "Maya Sen", frozenset({"live:view", "simulation:create", "simulation:share", "assurance:enterprise:view", "assurance:consultant:view"})),
-    "client": Principal("client-1", "Arun Mehta", frozenset({"assurance:client:view"})),
+    "client": Principal("client-1", "Arun Mehta", frozenset({"assurance:client:view", "assurance:client:decide"})),
 }
 
 
 class ConsoleApplication:
     def __init__(self):
         self.service = ConsoleService()
-        self.assurance = OperationalAssuranceService()
+        self.assurance = OperationalAssuranceService(lambda: self.service.live_state)
         with (ROOT / "config" / "m22_manipulated_variables.csv").open(encoding="utf-8-sig", newline="") as handle:
             self.variables = group_variable_register(csv.DictReader(handle))
 
@@ -56,10 +56,22 @@ def make_handler(application: ConsoleApplication):
                     self._json(application.assurance.bootstrap(self._principal(), view))
                 except Exception as exc:
                     self._error(exc)
+            elif path == "/api/operational-assurance/detail":
+                try:
+                    view = query.get("view", ["enterprise"])[0]
+                    panel = query.get("panel", [""])[0]
+                    self._json(application.assurance.detail(self._principal(), view, panel))
+                except Exception as exc:
+                    self._error(exc)
             elif path.startswith("/api/simulation-sessions/"):
                 try:
-                    session = application.service.get_session(self._principal(), path.rsplit("/", 1)[-1])
-                    self._json(self._session_payload(session))
+                    parts = path.strip("/").split("/")
+                    session_id = parts[2]
+                    if len(parts) == 4 and parts[3] == "collaboration":
+                        self._json(application.service.list_collaboration(self._principal(), session_id))
+                    else:
+                        session = application.service.get_session(self._principal(), session_id)
+                        self._json(self._session_payload(session))
                 except Exception as exc:
                     self._error(exc)
             elif path.startswith("/assets/"):
@@ -93,6 +105,30 @@ def make_handler(application: ConsoleApplication):
                     session_id = path.split("/")[3]
                     invite = application.service.invite(principal, session_id, str(body.get("actor_id", "")), str(body.get("role", "")))
                     self._json(invite, HTTPStatus.CREATED)
+                elif path.endswith("/invitations") and path.startswith("/api/simulation-sessions/"):
+                    session_id = path.split("/")[3]
+                    invitation = application.service.create_invitation(
+                        principal, session_id, str(body.get("actor_id", "")), str(body.get("role", "viewer")),
+                        ttl_minutes=int(body.get("ttl_minutes", 30)),
+                    )
+                    self._json(invitation, HTTPStatus.CREATED)
+                elif path.endswith("/invitations/revoke") and path.startswith("/api/simulation-sessions/"):
+                    session_id = path.split("/")[3]
+                    invitation = application.service.revoke_invitation(
+                        principal, session_id, str(body.get("token", ""))
+                    )
+                    self._json(invitation)
+                elif path == "/api/collaboration/join":
+                    result = application.service.join_invitation(principal, str(body.get("token", "")))
+                    self._json(result)
+                elif path == "/api/operational-assurance/client-decision":
+                    result = application.assurance.record_client_decision(
+                        principal,
+                        str(body.get("decision", "")),
+                        step_up_verified=bool(body.get("step_up_verified")),
+                        rationale=str(body.get("rationale", "")),
+                    )
+                    self._json(result, HTTPStatus.CREATED)
                 else:
                     self.send_error(HTTPStatus.NOT_FOUND)
             except Exception as exc:
@@ -107,15 +143,7 @@ def make_handler(application: ConsoleApplication):
 
         @staticmethod
         def _session_payload(session):
-            return {
-                "session_id": session.session_id,
-                "owner_id": session.owner_id,
-                "created_at": session.created_at,
-                "baseline_hash": session.baseline_hash,
-                "state": session.state.as_dict(),
-                "collaborators": session.collaborators,
-                "audit": session.audit,
-            }
+            return ConsoleService.session_payload(session)
 
         def _json(self, payload: dict, status=HTTPStatus.OK):
             data = json.dumps(payload).encode("utf-8")
@@ -138,7 +166,7 @@ def make_handler(application: ConsoleApplication):
             except (FileNotFoundError, OSError):
                 self.send_error(HTTPStatus.NOT_FOUND)
                 return
-            content_type = {".html": "text/html; charset=utf-8", ".png": "image/png", ".svg": "image/svg+xml"}.get(resolved.suffix.lower(), "application/octet-stream")
+            content_type = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".png": "image/png", ".svg": "image/svg+xml"}.get(resolved.suffix.lower(), "application/octet-stream")
             self.send_response(HTTPStatus.OK)
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(data)))

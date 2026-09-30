@@ -53,6 +53,23 @@ def test_m27_view_authorization_and_measure_separation():
     assert consultant_view["mandate"]["sandbox_only"] is True
     with pytest.raises(ConsoleAuthorizationError, match="ASSURANCE_VIEW_DENIED"):
         service.bootstrap(analyst, "consultant")
+    assert service._view_events[-1]["outcome"] == "DENIED"
+
+
+def test_m27_details_and_client_decision_are_governed_and_traceable():
+    service = OperationalAssuranceService()
+    client = Principal("client", "Client Approver", frozenset({"assurance:client:view", "assurance:client:decide"}))
+    detail = service.detail(client, "client", "Authority Requested")
+    assert detail["read_only"] is True
+    assert any(row["label"] == "Action" for row in detail["rows"])
+    with pytest.raises(ConsoleAuthorizationError, match="STEP_UP_REQUIRED"):
+        service.record_client_decision(client, "APPROVED", step_up_verified=False)
+    result = service.record_client_decision(client, "APPROVED", step_up_verified=True, rationale="UAT approval")
+    assert result["live_actions"] == 0
+    assert result["sandbox_execution_enabled"] is True
+    assert service.bootstrap(client, "client")["recommendation"]["status"] == "APPROVED"
+    with pytest.raises(ConsoleAuthorizationError, match="CLIENT_DECISION_ALREADY_FINAL"):
+        service.record_client_decision(client, "REJECTED", step_up_verified=True)
 
 
 def test_m27_rejects_incomplete_pilot_sequence():
@@ -98,5 +115,9 @@ def test_m27_console_packages_operational_assurance_workspace():
     assert "/api/operational-assurance/bootstrap" in source
     assert "OPERATIONAL ASSURANCE" in source
     assert "draggable" in source.lower()
+    script = (web.parent / "console.js").read_text(encoding="utf-8")
+    assert "EXPERT PARAMETER DECK" in script
+    assert "SCENARIO PRESETS" in script
+    assert "CREATE VIEWER INVITATION" in script
     server = (ROOT / "src" / "resilience" / "m22_web.py").read_text(encoding="utf-8")
     assert '"/api/operational-assurance/bootstrap"' in server

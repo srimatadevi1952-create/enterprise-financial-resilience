@@ -5,6 +5,7 @@ from resilience.m22_console import (
     Principal,
 )
 from resilience.config import ROOT
+import pytest
 
 
 ANALYST = Principal("analyst-1", "Asha Iyer", frozenset({"live:view", "simulation:create", "simulation:share"}))
@@ -45,11 +46,33 @@ def test_sharing_is_scoped_and_does_not_expose_other_sessions():
         raise AssertionError("viewer edited a simulation")
 
 
+def test_expiring_invitation_joins_only_the_named_read_only_viewer():
+    service = ConsoleService()
+    session = service.create_simulation(ANALYST, step_up_verified=True, purpose="Controlled collaboration")
+    invitation = service.create_invitation(ANALYST, session.session_id, VIEWER.actor_id, "viewer")
+    joined = service.join_invitation(VIEWER, invitation["token"])
+    assert joined["read_only"] is True
+    assert joined["session"]["session_id"] == session.session_id
+    assert joined["invitation"]["status"] == "JOINED"
+    with pytest.raises(ConsoleAuthorizationError, match="INVITATION_NOT_ACTIVE"):
+        service.join_invitation(VIEWER, invitation["token"])
+
+    revocable = service.create_invitation(ANALYST, session.session_id, VIEWER.actor_id, "viewer")
+    revoked = service.revoke_invitation(ANALYST, session.session_id, revocable["token"])
+    assert revoked["status"] == "REVOKED"
+    with pytest.raises(ConsoleAuthorizationError, match="INVITATION_NOT_ACTIVE"):
+        service.join_invitation(VIEWER, revocable["token"])
+
+
 def test_canvas_console_packages_the_approved_master_and_preserves_dom_version():
     web = ROOT / "src" / "resilience" / "web"
     index = (web / "index.html").read_text(encoding="utf-8")
     assert "m22-console-canvas-master-v2.png" in index
     assert "const DESIGN={w:1881,h:1073}" in index
+    script = (web / "console.js").read_text(encoding="utf-8")
+    assert "ctx.ellipse(941,452,139,127" in script
+    assert "EQUAL-WEIGHT NORMALISATION RULE V1" in script
+    assert "REVOKE ACCESS" in script
     assert (web / "m22-console-canvas-master-v2.png").stat().st_size > 100_000
     assert (web / "dom-console-v2.html").exists()
 

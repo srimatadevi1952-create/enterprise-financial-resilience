@@ -8,8 +8,9 @@ authorised per-user simulations, and explicitly scoped collaboration.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from hashlib import sha256
+import secrets
 from typing import Iterable
 from uuid import uuid4
 
@@ -68,6 +69,18 @@ class SimulationSession:
     audit: list[dict] = field(default_factory=list)
 
 
+@dataclass
+class CollaborationInvitation:
+    token: str
+    session_id: str
+    actor_id: str
+    role: str
+    created_by: str
+    created_at: str
+    expires_at: str
+    status: str = "PENDING"
+
+
 def stable_live_state() -> EnterpriseState:
     return EnterpriseState(
         as_of=datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
@@ -91,6 +104,7 @@ class ConsoleService:
     def __init__(self, live_state: EnterpriseState | None = None):
         self._live = live_state or stable_live_state()
         self._sessions: dict[str, SimulationSession] = {}
+        self._invitations: dict[str, CollaborationInvitation] = {}
 
     @property
     def live_state(self) -> EnterpriseState:
@@ -144,6 +158,118 @@ class ConsoleService:
         session.collaborators[actor_id.strip()] = role
         session.audit.append(self._event(principal, "COLLABORATOR_INVITED", actor_id=actor_id.strip(), role=role))
         return {"actor_id": actor_id.strip(), "role": role}
+
+    def create_invitation(
+        self,
+        principal: Principal,
+        session_id: str,
+        actor_id: str,
+        role: str,
+        *,
+        ttl_minutes: int = 30,
+    ) -> dict:
+        session = self.get_session(principal, session_id)
+        if principal.actor_id != session.owner_id:
+            raise ConsoleAuthorizationError("OWNER_REQUIRED")
+        self._require(principal, "simulation:share")
+        if role not in {"viewer", "co-analyst", "approver", "auditor"}:
+            raise ValueError("ROLE_INVALID")
+        if not actor_id.strip():
+            raise ValueError("COLLABORATOR_REQUIRED")
+        if ttl_minutes < 5 or ttl_minutes > 240:
+            raise ValueError("INVITATION_TTL_INVALID")
+        now = datetime.now(timezone.utc).replace(microsecond=0)
+        invitation = CollaborationInvitation(
+            token=secrets.token_urlsafe(24),
+            session_id=session_id,
+            actor_id=actor_id.strip(),
+            role=role,
+            created_by=principal.actor_id,
+            created_at=now.isoformat(),
+            expires_at=(now + timedelta(minutes=ttl_minutes)).isoformat(),
+        )
+        self._invitations[invitation.token] = invitation
+        session.audit.append(self._event(
+            principal,
+            "COLLABORATION_INVITATION_CREATED",
+            actor_id=invitation.actor_id,
+            role=role,
+            expires_at=invitation.expires_at,
+        ))
+        return self._invitation_payload(invitation)
+
+    def join_invitation(self, principal: Principal, token: str) -> dict:
+        invitation = self._invitations.get(token)
+        if invitation is None:
+            raise KeyError("INVITATION_NOT_FOUND")
+        if invitation.status != "PENDING":
+            raise ConsoleAuthorizationError("INVITATION_NOT_ACTIVE")
+        if datetime.fromisoformat(invitation.expires_at) <= datetime.now(timezone.utc):
+            invitation.status = "EXPIRED"
+            raise ConsoleAuthorizationError("INVITATION_EXPIRED")
+        if principal.actor_id != invitation.actor_id:
+            raise ConsoleAuthorizationError("INVITATION_IDENTITY_MISMATCH")
+        session = self._sessions[invitation.session_id]
+        session.collaborators[principal.actor_id] = invitation.role
+        invitation.status = "JOINED"
+        session.audit.append(self._event(principal, "COLLABORATOR_JOINED", role=invitation.role))
+        return {
+            "invitation": self._invitation_payload(invitation),
+            "session": self.session_payload(session),
+            "read_only": invitation.role in {"viewer", "approver", "auditor"},
+        }
+
+    def list_collaboration(self, principal: Principal, session_id: str) -> dict:
+        session = self.get_session(principal, session_id)
+        invitations = [
+            self._invitation_payload(item)
+            for item in self._invitations.values()
+            if item.session_id == session_id
+        ]
+        return {
+            "owner_id": session.owner_id,
+            "participants": [
+                {"actor_id": actor_id, "role": role, "status": "JOINED"}
+                for actor_id, role in sorted(session.collaborators.items())
+            ],
+            "invitations": invitations,
+        }
+
+    def revoke_invitation(self, principal: Principal, session_id: str, token: str) -> dict:
+        session = self.get_session(principal, session_id)
+        if principal.actor_id != session.owner_id:
+            raise ConsoleAuthorizationError("OWNER_REQUIRED")
+        invitation = self._invitations.get(token)
+        if invitation is None or invitation.session_id != session_id:
+            raise KeyError("INVITATION_NOT_FOUND")
+        invitation.status = "REVOKED"
+        session.collaborators.pop(invitation.actor_id, None)
+        session.audit.append(self._event(principal, "COLLABORATION_INVITATION_REVOKED", actor_id=invitation.actor_id))
+        return self._invitation_payload(invitation)
+
+    @staticmethod
+    def _invitation_payload(invitation: CollaborationInvitation) -> dict:
+        return {
+            "token": invitation.token,
+            "session_id": invitation.session_id,
+            "actor_id": invitation.actor_id,
+            "role": invitation.role,
+            "created_at": invitation.created_at,
+            "expires_at": invitation.expires_at,
+            "status": invitation.status,
+        }
+
+    @staticmethod
+    def session_payload(session: SimulationSession) -> dict:
+        return {
+            "session_id": session.session_id,
+            "owner_id": session.owner_id,
+            "created_at": session.created_at,
+            "baseline_hash": session.baseline_hash,
+            "state": session.state.as_dict(),
+            "collaborators": session.collaborators,
+            "audit": session.audit,
+        }
 
     @staticmethod
     def _require(principal: Principal, scope: str) -> None:

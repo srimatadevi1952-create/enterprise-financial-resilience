@@ -106,36 +106,70 @@ class ControlledPilotSpec(BaseModel):
 
 
 class OperationalAssuranceService:
-    """Role-aware M27 view model with no live-action capability."""
+    """Role-aware UAT workspace with explicit synthetic-data labelling.
 
-    def __init__(self):
-        self._enterprise = {
+    The state provider binds the enterprise cards to the current console state.
+    M23-M26 records below are controlled UAT fixtures until an approved database
+    and client feed are connected; the API always discloses that boundary.
+    """
+
+    def __init__(self, state_provider=None):
+        self._state_provider = state_provider
+        self._decision = "AWAITING_DECISION"
+        self._decision_events: list[dict] = []
+        self._view_events: list[dict] = []
+
+    def _enterprise(self) -> dict:
+        state = self._state_provider().as_dict() if self._state_provider else {
+            "as_of": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+            "probability": 0.0, "impact": 0.0, "resilience": 87,
+        }
+        severity = round(state["probability"] * state["impact"], 1)
+        return {
             "operating_model": "ENTERPRISE",
             "workspace_title": "Enterprise Operational Assurance",
             "tenant_context": "Example Payments Group",
-            "configuration": {"version": 2, "status": "ACTIVE", "processes": 4, "controls": 5},
-            "risk_state": {"severity": 7, "confidence_pct": 92, "resilience": 87, "workflow_status": "MONITORED"},
+            "configuration": {"version": 2, "status": "ACTIVE", "processes": 4, "controls": 5, "owner": "Asha Iyer"},
+            "risk_state": {"severity": severity, "confidence_pct": 92, "resilience": state["resilience"], "workflow_status": "MONITORED"},
+            "measure_context": {"scope": "ENTERPRISE LIVE", "scale": "SEVERITY 0-100 HIGHER WORSE · RESILIENCE 0-100 HIGHER BETTER", "as_of": state["as_of"], "reference": "PAYMENTS-GROUP/CONFIG-V2"},
             "obligations": {"open": 3, "overdue": 1, "qualified_assessments": 1},
             "changes": {"open": 1, "awaiting_approval": 0},
             "knowledge": {"current_lessons": 2, "related_precedents": 1},
             "panels": ["Configuration", "Changes", "Information", "Evidence Confidence", "Prior Cases", "Audit Trail"],
         }
-        self._consultant = {
+
+    def _consultant(self) -> dict:
+        return {
             "operating_model": "CONSULTANT",
             "workspace_title": "Consultant Control Centre",
             "tenant_context": "Assigned Client Portfolio",
-            "portfolio": {"assigned_clients": 2, "changes_to_review": 1, "pending_client_decisions": 1, "expiring_mandates": 0},
-            "risk_state": {"severity": 7, "confidence_pct": 94, "resilience": 82, "workflow_status": "CLIENT_DECISION"},
+            "portfolio": {"assigned_clients": 2, "changes_to_review": 1, "pending_client_decisions": 1 if self._decision == "AWAITING_DECISION" else 0, "expiring_mandates": 0},
+            "risk_state": {"severity": 7, "confidence_pct": 94, "resilience": 82, "workflow_status": "CLIENT_DECISION" if self._decision == "AWAITING_DECISION" else self._decision},
+            "measure_context": {"scope": "CLIENT CASE", "scale": "SEVERITY 0-10 HIGHER WORSE · RESILIENCE 0-100 HIGHER BETTER", "as_of": "2026-09-29T09:00:00+00:00", "reference": "CASE-CHANGE-001 / SIM-M27-001"},
             "active_client": "Example Payments Group",
-            "mandate": {"status": "ACTIVE", "mode": "DELEGATED", "sandbox_only": True},
+            "mandate": {"status": "ACTIVE", "mode": "DELEGATED", "sandbox_only": True, "expires_at": "2026-12-31T23:59:59+00:00"},
             "panels": ["Client Portfolio", "Change Inbox", "Expert Assessment", "Simulation", "Client Decision", "Implementation", "Outcome Review"],
         }
-        self._client = {
+
+    def _client(self) -> dict:
+        return {
             "operating_model": "CLIENT_APPROVAL",
             "workspace_title": "Client Decision Portal",
             "tenant_context": "Example Payments Group",
-            "recommendation": {"status": "AWAITING_DECISION", "implementation_mode": "DELEGATED", "simulation_ref": "simulation:m27:pilot"},
-            "risk_state": {"severity": 7, "confidence_pct": 94, "resilience": 82, "workflow_status": "AWAITING_CLIENT_DECISION"},
+            "recommendation": {
+                "status": self._decision,
+                "implementation_mode": "DELEGATED",
+                "simulation_ref": "SIM-M27-001",
+                "summary": "Activate the approved alternate settlement route for the affected window.",
+                "rationale": "The simulated route restores settlement delay below ten minutes without increasing failed payments.",
+                "authority": "One sandbox route switch; expires after this case; revocable before execution.",
+            },
+            "risk_state": {"severity": 7, "confidence_pct": 94, "resilience": 82, "workflow_status": "AWAITING_CLIENT_DECISION" if self._decision == "AWAITING_DECISION" else self._decision},
+            "measure_context": {"scope": "CLIENT DECISION PACKAGE", "scale": "SEVERITY 0-10 HIGHER WORSE · RESILIENCE 0-100 HIGHER BETTER", "as_of": "2026-09-29T09:00:00+00:00", "reference": "CHANGE-001 / SIM-M27-001"},
+            "options": [
+                {"key": "RECOMMENDED", "label": "Alternate settlement route", "resilience": 82, "residual_severity": 3},
+                {"key": "DEFER", "label": "Continue current route", "resilience": 68, "residual_severity": 7},
+            ],
             "panels": ["Current State", "Consultant Assessment", "Options", "Simulated Effect", "Authority Requested", "Decision Evidence"],
         }
 
@@ -148,15 +182,70 @@ class OperationalAssuranceService:
         if scope is None:
             raise ValueError("ASSURANCE_VIEW_INVALID")
         if scope not in principal.scopes:
+            self._view_events.append({
+                "at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+                "actor_id": principal.actor_id,
+                "view": view,
+                "outcome": "DENIED",
+            })
             raise ConsoleAuthorizationError("ASSURANCE_VIEW_DENIED")
-        source = {"enterprise": self._enterprise, "consultant": self._consultant, "client": self._client}[view]
+        source = {"enterprise": self._enterprise, "consultant": self._consultant, "client": self._client}[view]()
+        self._view_events.append({
+            "at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+            "actor_id": principal.actor_id,
+            "view": view,
+            "outcome": "GRANTED",
+        })
         return {
             **json.loads(json.dumps(source)),
             "principal": {"actor_id": principal.actor_id, "display_name": principal.display_name},
             "draggable_panels": True,
             "live_actions": 0,
             "severity_confidence_resilience_separate": True,
+            "data_mode": "SYNTHETIC_UAT",
+            "data_notice": "Controlled synthetic records; connect approved M23-M26 tenant data before live-data pilot.",
         }
+
+    def detail(self, principal: Principal, view: str, panel: str) -> dict:
+        workspace = self.bootstrap(principal, view)
+        if panel not in workspace["panels"]:
+            raise ValueError("ASSURANCE_PANEL_INVALID")
+        common = {
+            "Configuration": [("Version", "V2 ACTIVE"), ("Owner", "Asha Iyer"), ("Processes", "4"), ("Controls", "5"), ("Evidence", "process-register:v2")],
+            "Changes": [("Change", "CHANGE-001"), ("Status", "OPEN"), ("Owner", "Maya Sen"), ("Simulation", "SIM-M27-001"), ("Evidence", "assessment:accepted")],
+            "Information": [("Open", "3"), ("Overdue", "1"), ("Owner", "Client finance contact"), ("Escalation", "ACTIVE"), ("Evidence", "obligation:settlement-confirmation")],
+            "Evidence Confidence": [("Confidence", "92%"), ("Completeness", "90%"), ("Freshness", "94%"), ("Rule", "CONF-V1"), ("Gap", "1 material item")],
+            "Prior Cases": [("Published", "2"), ("Related", "1"), ("Top case", "Gateway interruption recovery"), ("Status", "ADVISORY ONLY"), ("Evidence", "case:GATEWAY-RECOVERY-001")],
+            "Audit Trail": [("View events", str(len(self._view_events))), ("Decision events", str(len(self._decision_events))), ("Live actions", "0"), ("Retention", "7 years"), ("Export", "Controlled evidence pack")],
+            "Client Portfolio": [("Assigned clients", "2"), ("Active client", "Example Payments Group"), ("Assignment", "ACTIVE"), ("Tenant", "TENANT-UAT-001"), ("Isolation", "PASS")],
+            "Change Inbox": [("Change", "CHANGE-001"), ("Status", "CLIENT DECISION"), ("Severity", "7/10"), ("Confidence", "94%"), ("Owner", "Maya Sen")],
+            "Expert Assessment": [("Assessor", "Maya Sen"), ("Disposition", "ACCEPTED"), ("Rationale", "Settlement delay breaches approved target"), ("Limit", "Synthetic UAT evidence"), ("Attestation", "RECORDED")],
+            "Simulation": [("Reference", "SIM-M27-001"), ("Baseline resilience", "68"), ("Expected resilience", "82"), ("Live actions", "0"), ("Boundary", "PRIVATE SANDBOX")],
+            "Client Decision": [("Status", self._decision), ("Decision maker", "Arun Mehta"), ("Step-up", "REQUIRED"), ("SoD", "CONSULTANT CANNOT SELF-APPROVE"), ("Evidence", "decision:pending")],
+            "Implementation": [("Mode", "DELEGATED"), ("Target", "gateway:alternate"), ("Boundary", "SANDBOX ONLY"), ("Mandate expiry", "2026-12-31"), ("Live actions", "0")],
+            "Outcome Review": [("Status", "PENDING DECISION"), ("Success measure", "Delay below 10 minutes"), ("Owner", "Client approver"), ("Evidence", "post-change observation required"), ("Lesson", "Publish after validation")],
+            "Current State": [("Severity", "7/10"), ("Confidence", "94%"), ("Resilience", "68 baseline"), ("Case", "CASE-CHANGE-001"), ("As of", "2026-09-29 09:00 UTC")],
+            "Consultant Assessment": [("Consultant", "Maya Sen"), ("Recommendation", "Alternate settlement route"), ("Rationale", "Restore delay below target"), ("Limitations", "Controlled synthetic evidence"), ("Attestation", "RECORDED")],
+            "Options": [("Recommended", "Alternate route → resilience 82"), ("Defer", "Current route → resilience 68"), ("Rollback", "Restore original route"), ("Residual severity", "3 vs 7"), ("Decision", self._decision)],
+            "Simulated Effect": [("Baseline resilience", "68"), ("Expected resilience", "82"), ("Settlement delay", "8 minutes"), ("Failed payments", "16 max"), ("Simulation", "SIM-M27-001")],
+            "Authority Requested": [("Action", "SWITCH_SETTLEMENT_ROUTE"), ("Target", "gateway:alternate"), ("Scope", "One sandbox execution"), ("Expiry", "After this case"), ("Revocable", "Until execution")],
+            "Decision Evidence": [("Status", self._decision), ("Approver", "Arun Mehta"), ("Step-up", "REQUIRED"), ("Evidence pack", "COMPLETE FOR UAT"), ("Live actions", "0")],
+        }
+        return {"title": panel, "rows": [{"label": a, "value": b} for a, b in common[panel]], "source": workspace["measure_context"], "read_only": True}
+
+    def record_client_decision(self, principal: Principal, decision: str, *, step_up_verified: bool, rationale: str = "") -> dict:
+        if "assurance:client:decide" not in principal.scopes:
+            raise ConsoleAuthorizationError("CLIENT_DECISION_DENIED")
+        if not step_up_verified:
+            raise ConsoleAuthorizationError("STEP_UP_REQUIRED")
+        if decision not in {"APPROVED", "REJECTED", "CLARIFICATION_REQUESTED"}:
+            raise ValueError("CLIENT_DECISION_INVALID")
+        if self._decision in {"APPROVED", "REJECTED"}:
+            raise ConsoleAuthorizationError("CLIENT_DECISION_ALREADY_FINAL")
+        self._decision = decision
+        event = {"at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(), "actor_id": principal.actor_id, "decision": decision, "rationale": rationale, "live_actions": 0}
+        self._decision_events.append(event)
+        return {**event, "status": decision, "sandbox_execution_enabled": decision == "APPROVED", "live_actions": 0}
 
 
 def record_controlled_pilot(conn, tenant: UUID, value) -> dict:
