@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in · Enterprise Financial Resilience</title>
+<style>
+:root{--paper:#eeeae0;--ink:#24231f;--muted:#716d65;--orange:#ed4b15;--line:#aaa399}*{box-sizing:border-box}html,body{min-height:100%;margin:0}body{font-family:"Arial Narrow",Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 70% 40%,rgba(237,75,21,.08),transparent 30%),linear-gradient(115deg,#f5f1e7,#e7e2d7);display:grid;place-items:center;padding:28px}.shell{width:min(1120px,100%);min-height:650px;border:2px solid var(--ink);background:rgba(245,242,234,.9);display:grid;grid-template-columns:1.1fr .9fr;box-shadow:0 18px 60px rgba(20,18,14,.2)}.identity{padding:60px;border-right:1px solid var(--line);position:relative;overflow:hidden}.identity:after{content:"";position:absolute;width:430px;height:430px;border:1px dashed var(--orange);border-radius:50%;right:-170px;bottom:-170px;box-shadow:0 0 0 55px rgba(237,75,21,.05),0 0 0 110px rgba(237,75,21,.03)}.eyebrow,.caption{letter-spacing:.28em;text-transform:uppercase;color:var(--muted);font-size:12px}.mark{display:grid;grid-template-columns:repeat(5,9px);gap:9px;margin:70px 0 34px}.mark i{width:9px;height:9px;border-radius:50%;background:var(--orange)}h1{font-size:44px;line-height:1.06;letter-spacing:.08em;text-transform:uppercase;margin:0 0 24px;max-width:600px}.identity p{max-width:520px;font-size:17px;line-height:1.6;color:var(--muted)}.access{padding:60px;display:flex;flex-direction:column;justify-content:center}.access h2{font-size:28px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 10px}.rule{width:84px;height:4px;background:var(--orange);margin:18px 0 30px}.field{display:block;margin:18px 0}.field span{display:block;font-size:12px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}.field input{width:100%;height:52px;border:1px solid var(--ink);background:#f8f5ed;padding:0 16px;font:18px inherit;outline:none}.field input:focus{box-shadow:0 0 0 3px rgba(237,75,21,.25)}button{height:52px;border:1px solid var(--ink);background:var(--orange);color:white;font:700 14px inherit;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%;margin-top:10px}button.secondary{background:transparent;color:var(--ink)}button:disabled{opacity:.5;cursor:wait}.notice{min-height:42px;margin-top:18px;color:var(--muted);line-height:1.45}.dev{border:1px solid var(--orange);padding:12px;margin-top:10px;background:#fff4df;display:none}.fine{margin-top:auto;padding-top:30px;font-size:12px;line-height:1.6;color:var(--muted)}[hidden]{display:none!important}@media(max-width:780px){.shell{grid-template-columns:1fr}.identity{padding:34px;border-right:0;border-bottom:1px solid var(--line)}.mark{margin:28px 0 22px}h1{font-size:30px}.access{padding:34px}.fine{margin-top:24px}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <section class="identity">
+    <div class="eyebrow">Enterprise Financial Resilience</div>
+    <div class="mark" aria-hidden="true"></div>
+    <h1>Controlled access to the resilience operating system</h1>
+    <p>Live monitoring, private simulations, consultant assessment and client decisions are separated by role and recorded for assurance.</p>
+  </section>
+  <section class="access">
+    <div class="caption">Invitation only</div>
+    <h2>Secure sign in</h2><div class="rule"></div>
+    <form id="request-form">
+      <label class="field"><span>Invited email address</span><input id="email" name="email" type="email" autocomplete="email" required></label>
+      <button id="request-button" type="submit">Send one-time code</button>
+    </form>
+    <form id="verify-form" hidden>
+      <label class="field"><span>Six-digit verification code</span><input id="code" name="code" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" maxlength="6" required></label>
+      <button id="verify-button" type="submit">Enter secure console</button>
+      <button id="back-button" class="secondary" type="button">Use another address</button>
+    </form>
+    <div id="notice" class="notice" role="status" aria-live="polite"></div>
+    <div id="development-code" class="dev"></div>
+    <div class="fine">Access is time limited. Activity is audited. Live actions and private simulations remain subject to separate authority.</div>
+  </section>
+</main>
+<script src="/web-assets/login.js"></script>
+</body>
+</html>
+

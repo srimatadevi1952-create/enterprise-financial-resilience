@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import json
 from http import HTTPStatus
+from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
@@ -13,21 +14,18 @@ from .config import ROOT
 from .m22_console import ConsoleAuthorizationError, ConsoleService, Principal, group_variable_register
 from .m27_assurance import OperationalAssuranceService
 from .m28_scenario_intelligence import explain_console_scenario
+from .m29_auth import AuthService, AuthenticationError
 
 
 WEB_ROOT = Path(__file__).with_name("web")
 ASSET_ROOT = ROOT / "docs" / "assets"
 
-PRINCIPALS = {
-    "analyst": Principal("analyst-1", "Asha Iyer", frozenset({"live:view", "simulation:create", "simulation:share", "assurance:enterprise:view"})),
-    "viewer": Principal("viewer-1", "Dev Rao", frozenset({"live:view"})),
-    "consultant": Principal("consultant-1", "Maya Sen", frozenset({"live:view", "simulation:create", "simulation:share", "assurance:enterprise:view", "assurance:consultant:view"})),
-    "client": Principal("client-1", "Arun Mehta", frozenset({"assurance:client:view", "assurance:client:decide"})),
-}
+SESSION_COOKIE = "efr_uat_session"
 
 
 class ConsoleApplication:
-    def __init__(self):
+    def __init__(self, auth: AuthService | None = None):
+        self.auth = auth or AuthService.from_environment()
         self.service = ConsoleService()
         self.assurance = OperationalAssuranceService(lambda: self.service.live_state)
         with (ROOT / "config" / "m22_manipulated_variables.csv").open(encoding="utf-8-sig", newline="") as handle:
@@ -41,15 +39,33 @@ def make_handler(application: ConsoleApplication):
         def do_GET(self):
             path = unquote(urlparse(self.path).path)
             query = parse_qs(urlparse(self.path).query)
-            if path == "/api/bootstrap":
+            if path.startswith("/api/"):
+                try:
+                    self._user()
+                except AuthenticationError as exc:
+                    self._error(exc)
+                    return
+            if path == "/login":
+                if self._optional_user():
+                    self._redirect("/")
+                else:
+                    self._file(WEB_ROOT / "login.html")
+            elif path == "/api/auth/session":
+                user = self._user()
+                self._json({
+                    "authenticated": True,
+                    "user": {"actor_id": user.actor_id, "display_name": user.display_name, "role": user.role},
+                    "access_expires_at": user.access_expires_at.isoformat(),
+                })
+            elif path == "/api/bootstrap":
                 principal = self._principal()
                 self._json({
                     "principal": {"actor_id": principal.actor_id, "display_name": principal.display_name, "scopes": sorted(principal.scopes)},
                     "mode": "live",
                     "live": application.service.live_state.as_dict(),
                     "variables": application.variables,
-                    "environment": "development",
-                    "identity_adapter": "local-development",
+                    "environment": application.auth.environment,
+                    "identity_adapter": "invitation-one-time-code",
                     "model_profile": {
                         "model_version": "DEFAULT-UAT-V1",
                         "calibration_state": "DEFAULT_UNCALIBRATED",
@@ -86,9 +102,15 @@ def make_handler(application: ConsoleApplication):
             elif path.startswith("/web-assets/"):
                 self._file(WEB_ROOT / path.removeprefix("/web-assets/"))
             elif path == "/dom-console-v2.html":
-                self._file(WEB_ROOT / "dom-console-v2.html")
+                if self._optional_user():
+                    self._file(WEB_ROOT / "dom-console-v2.html")
+                else:
+                    self._redirect("/login")
             elif path in {"/", "/index.html", "/*", "/**"}:
-                self._file(WEB_ROOT / "index.html")
+                if self._optional_user():
+                    self._file(WEB_ROOT / "index.html")
+                else:
+                    self._redirect("/login")
             else:
                 self.send_error(HTTPStatus.NOT_FOUND)
 
@@ -96,6 +118,27 @@ def make_handler(application: ConsoleApplication):
             path = urlparse(self.path).path
             try:
                 body = self._body()
+                if path == "/api/auth/request-code":
+                    result = application.auth.request_code(str(body.get("email", "")), remote_address=self.client_address[0])
+                    self._json(result, HTTPStatus.ACCEPTED)
+                    return
+                if path == "/api/auth/verify-code":
+                    token, user = application.auth.verify_code(
+                        str(body.get("email", "")), str(body.get("code", "")), remote_address=self.client_address[0]
+                    )
+                    secure = self.headers.get("X-Forwarded-Proto", "http").casefold() == "https"
+                    self._json(
+                        {"authenticated": True, "user": {"display_name": user.display_name, "role": user.role}},
+                        headers={"Set-Cookie": self._session_cookie(token, secure=secure)},
+                    )
+                    return
+                if path == "/api/auth/logout":
+                    application.auth.logout(self._session_token(), remote_address=self.client_address[0])
+                    self._json(
+                        {"authenticated": False},
+                        headers={"Set-Cookie": self._session_cookie("", max_age=0)},
+                    )
+                    return
                 principal = self._principal()
                 if path == "/api/simulation-sessions":
                     session = application.service.create_simulation(
@@ -143,8 +186,23 @@ def make_handler(application: ConsoleApplication):
             except Exception as exc:
                 self._error(exc)
 
+        def _session_token(self) -> str | None:
+            cookie = SimpleCookie()
+            cookie.load(self.headers.get("Cookie", ""))
+            morsel = cookie.get(SESSION_COOKIE)
+            return morsel.value if morsel else None
+
+        def _user(self):
+            return application.auth.authenticate(self._session_token())
+
+        def _optional_user(self):
+            try:
+                return self._user()
+            except AuthenticationError:
+                return None
+
         def _principal(self) -> Principal:
-            return PRINCIPALS.get(self.headers.get("X-EFR-Principal", "analyst"), PRINCIPALS["viewer"])
+            return self._user().principal()
 
         def _body(self) -> dict:
             length = int(self.headers.get("Content-Length", "0"))
@@ -154,16 +212,39 @@ def make_handler(application: ConsoleApplication):
         def _session_payload(session):
             return ConsoleService.session_payload(session)
 
-        def _json(self, payload: dict, status=HTTPStatus.OK):
+        def _json(self, payload: dict, status=HTTPStatus.OK, headers: dict | None = None):
             data = json.dumps(payload).encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-Content-Type-Options", "nosniff")
+            self.send_header("Referrer-Policy", "no-referrer")
+            self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
             self.send_header("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'")
+            for name, value in (headers or {}).items():
+                self.send_header(name, value)
             self.end_headers()
             self.wfile.write(data)
+
+        @staticmethod
+        def _session_cookie(value: str, *, secure: bool = False, max_age: int | None = None) -> str:
+            cookie = SimpleCookie()
+            cookie[SESSION_COOKIE] = value
+            cookie[SESSION_COOKIE]["path"] = "/"
+            cookie[SESSION_COOKIE]["httponly"] = True
+            cookie[SESSION_COOKIE]["samesite"] = "Strict"
+            if secure:
+                cookie[SESSION_COOKIE]["secure"] = True
+            if max_age is not None:
+                cookie[SESSION_COOKIE]["max-age"] = max_age
+            return cookie.output(header="").strip()
+
+        def _redirect(self, location: str):
+            self.send_response(HTTPStatus.SEE_OTHER)
+            self.send_header("Location", location)
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
 
         def _file(self, path: Path):
             try:
@@ -186,6 +267,8 @@ def make_handler(application: ConsoleApplication):
         def _error(self, exc: Exception):
             if isinstance(exc, ConsoleAuthorizationError):
                 status = HTTPStatus.FORBIDDEN
+            elif isinstance(exc, AuthenticationError):
+                status = HTTPStatus.UNAUTHORIZED
             elif isinstance(exc, KeyError):
                 status = HTTPStatus.NOT_FOUND
             elif isinstance(exc, (ValueError, TypeError, json.JSONDecodeError)):

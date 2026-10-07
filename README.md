@@ -39,6 +39,17 @@ The console is restricted to the local development profile and binds only to `12
 
 Open `http://127.0.0.1:8766/`. The current identity adapter and session store are development-only. Production deployment requires the organisation's identity provider, durable session and audit storage, approved live-data feeds, and collaboration-provider integration.
 
+The console now opens at an invitation-only M29 sign-in screen. For local UAT, use one of the four development identities shown below; the six-digit code appears on the sign-in screen after the email is accepted. This visible code is deliberately restricted to the local development adapter.
+
+| Role | Local UAT email |
+| --- | --- |
+| Simulation analyst | `asha.iyer@example.test` |
+| Viewer | `dev.rao@example.test` |
+| Consultant | `maya.sen@example.test` |
+| Client approver | `arun.mehta@example.test` |
+
+The old `X-EFR-Principal` identity switch is no longer accepted. The authenticated server-side session determines the role and permissions. Hosted UAT must use durable authentication storage and email delivery; the application refuses the in-memory development repository outside the development environment.
+
 ## Check the environment
 
 From this directory in PowerShell:
