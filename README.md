@@ -50,6 +50,10 @@ The console now opens at an invitation-only M29 sign-in screen. For local UAT, u
 
 The old `X-EFR-Principal` identity switch is no longer accepted. The authenticated server-side session determines the role and permissions. Hosted UAT must use durable authentication storage and email delivery; the application refuses the in-memory development repository outside the development environment.
 
+## Vercel hosted UAT
+
+M29 includes a Vercel Python Function entry point, catch-all routing, Neon PostgreSQL persistence for authentication and simulations, Resend delivery for one-time codes, a public health check and guarded administration scripts. The hosted application starts only when `EFR_APP_ENV=uat` and all required database, signing and email configuration is present. The exact provisioning and verification sequence is in [M29 Vercel UAT Deployment](docs/M29_VERCEL_UAT_DEPLOYMENT.md).
+
 ## Check the environment
 
 From this directory in PowerShell:

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 from http import HTTPStatus
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -26,8 +27,24 @@ SESSION_COOKIE = "efr_uat_session"
 class ConsoleApplication:
     def __init__(self, auth: AuthService | None = None):
         self.auth = auth or AuthService.from_environment()
-        self.service = ConsoleService()
-        self.assurance = OperationalAssuranceService(lambda: self.service.live_state)
+        environment = os.environ.get("EFR_APP_ENV", "development").strip().casefold()
+        if environment == "development":
+            self.service = ConsoleService()
+            self.assurance = OperationalAssuranceService(lambda: self.service.live_state)
+        elif environment == "uat":
+            from .m29_hosted import PostgresAssuranceRepository, PostgresConsoleRepository
+            database_url = os.environ.get("DATABASE_URL", "")
+            if not database_url:
+                raise AuthenticationError("HOSTED_DATABASE_CONFIGURATION_INCOMPLETE")
+            self.service = ConsoleService(repository=PostgresConsoleRepository(database_url))
+            assurance_repository = PostgresAssuranceRepository(database_url)
+            self.assurance = OperationalAssuranceService(
+                lambda: self.service.live_state,
+                decision_loader=assurance_repository.current_decision,
+                event_recorder=assurance_repository.record_event,
+            )
+        else:
+            raise AuthenticationError("APP_ENVIRONMENT_INVALID")
         with (ROOT / "config" / "m22_manipulated_variables.csv").open(encoding="utf-8-sig", newline="") as handle:
             self.variables = group_variable_register(csv.DictReader(handle))
 
@@ -39,6 +56,13 @@ def make_handler(application: ConsoleApplication):
         def do_GET(self):
             path = unquote(urlparse(self.path).path)
             query = parse_qs(urlparse(self.path).query)
+            if path == "/api/health":
+                try:
+                    health = application.auth.health()
+                    self._json(health, HTTPStatus.OK if health["status"] == "ok" else HTTPStatus.SERVICE_UNAVAILABLE)
+                except Exception:
+                    self._json({"status": "unavailable"}, HTTPStatus.SERVICE_UNAVAILABLE)
+                return
             if path.startswith("/api/"):
                 try:
                     self._user()
@@ -73,6 +97,11 @@ def make_handler(application: ConsoleApplication):
                         "notice": "Connect approved enterprise history and activate an independently approved M28 calibration.",
                     },
                 })
+            elif path == "/api/auth/collaborators":
+                try:
+                    self._json({"collaborators": application.auth.eligible_collaborators(self._principal())})
+                except Exception as exc:
+                    self._error(exc)
             elif path == "/api/operational-assurance/bootstrap":
                 try:
                     view = query.get("view", ["enterprise"])[0]
@@ -268,7 +297,7 @@ def make_handler(application: ConsoleApplication):
             if isinstance(exc, ConsoleAuthorizationError):
                 status = HTTPStatus.FORBIDDEN
             elif isinstance(exc, AuthenticationError):
-                status = HTTPStatus.UNAUTHORIZED
+                status = HTTPStatus.FORBIDDEN if str(exc) == "COLLABORATOR_DIRECTORY_DENIED" else HTTPStatus.UNAUTHORIZED
             elif isinstance(exc, KeyError):
                 status = HTTPStatus.NOT_FOUND
             elif isinstance(exc, (ValueError, TypeError, json.JSONDecodeError)):

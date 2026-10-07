@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 import secrets
-from typing import Iterable
+from typing import Iterable, Protocol
 from uuid import uuid4
 
 
@@ -81,6 +81,35 @@ class CollaborationInvitation:
     status: str = "PENDING"
 
 
+class ConsoleRepository(Protocol):
+    def save_session(self, session: SimulationSession) -> None: ...
+    def get_session(self, session_id: str) -> SimulationSession | None: ...
+    def save_invitation(self, invitation: CollaborationInvitation) -> None: ...
+    def get_invitation(self, token: str) -> CollaborationInvitation | None: ...
+    def list_invitations(self, session_id: str) -> list[CollaborationInvitation]: ...
+
+
+class InMemoryConsoleRepository:
+    def __init__(self):
+        self.sessions: dict[str, SimulationSession] = {}
+        self.invitations: dict[str, CollaborationInvitation] = {}
+
+    def save_session(self, session: SimulationSession) -> None:
+        self.sessions[session.session_id] = session
+
+    def get_session(self, session_id: str) -> SimulationSession | None:
+        return self.sessions.get(session_id)
+
+    def save_invitation(self, invitation: CollaborationInvitation) -> None:
+        self.invitations[invitation.token] = invitation
+
+    def get_invitation(self, token: str) -> CollaborationInvitation | None:
+        return self.invitations.get(token)
+
+    def list_invitations(self, session_id: str) -> list[CollaborationInvitation]:
+        return [item for item in self.invitations.values() if item.session_id == session_id]
+
+
 def stable_live_state() -> EnterpriseState:
     return EnterpriseState(
         as_of=datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
@@ -101,10 +130,9 @@ class ConsoleService:
     mutate the live view or another user's session.
     """
 
-    def __init__(self, live_state: EnterpriseState | None = None):
+    def __init__(self, live_state: EnterpriseState | None = None, repository: ConsoleRepository | None = None):
         self._live = live_state or stable_live_state()
-        self._sessions: dict[str, SimulationSession] = {}
-        self._invitations: dict[str, CollaborationInvitation] = {}
+        self._repository = repository or InMemoryConsoleRepository()
 
     @property
     def live_state(self) -> EnterpriseState:
@@ -125,11 +153,11 @@ class ConsoleService:
             state=self._live,
         )
         session.audit.append(self._event(principal, "SIMULATION_CREATED", purpose=purpose.strip()))
-        self._sessions[session.session_id] = session
+        self._repository.save_session(session)
         return session
 
     def get_session(self, principal: Principal, session_id: str) -> SimulationSession:
-        session = self._sessions.get(session_id)
+        session = self._repository.get_session(session_id)
         if not session:
             raise KeyError("SESSION_NOT_FOUND")
         if principal.actor_id != session.owner_id and principal.actor_id not in session.collaborators:
@@ -144,6 +172,7 @@ class ConsoleService:
         normalised = self._normalise_controls(values)
         session.state = self._calculate(normalised)
         session.audit.append(self._event(principal, "SCENARIO_RUN", controls=normalised))
+        self._repository.save_session(session)
         return session.state
 
     def invite(self, principal: Principal, session_id: str, actor_id: str, role: str) -> dict:
@@ -157,6 +186,7 @@ class ConsoleService:
             raise ValueError("COLLABORATOR_REQUIRED")
         session.collaborators[actor_id.strip()] = role
         session.audit.append(self._event(principal, "COLLABORATOR_INVITED", actor_id=actor_id.strip(), role=role))
+        self._repository.save_session(session)
         return {"actor_id": actor_id.strip(), "role": role}
 
     def create_invitation(
@@ -188,7 +218,7 @@ class ConsoleService:
             created_at=now.isoformat(),
             expires_at=(now + timedelta(minutes=ttl_minutes)).isoformat(),
         )
-        self._invitations[invitation.token] = invitation
+        self._repository.save_invitation(invitation)
         session.audit.append(self._event(
             principal,
             "COLLABORATION_INVITATION_CREATED",
@@ -196,23 +226,29 @@ class ConsoleService:
             role=role,
             expires_at=invitation.expires_at,
         ))
+        self._repository.save_session(session)
         return self._invitation_payload(invitation)
 
     def join_invitation(self, principal: Principal, token: str) -> dict:
-        invitation = self._invitations.get(token)
+        invitation = self._repository.get_invitation(token)
         if invitation is None:
             raise KeyError("INVITATION_NOT_FOUND")
         if invitation.status != "PENDING":
             raise ConsoleAuthorizationError("INVITATION_NOT_ACTIVE")
         if datetime.fromisoformat(invitation.expires_at) <= datetime.now(timezone.utc):
             invitation.status = "EXPIRED"
+            self._repository.save_invitation(invitation)
             raise ConsoleAuthorizationError("INVITATION_EXPIRED")
         if principal.actor_id != invitation.actor_id:
             raise ConsoleAuthorizationError("INVITATION_IDENTITY_MISMATCH")
-        session = self._sessions[invitation.session_id]
+        session = self._repository.get_session(invitation.session_id)
+        if session is None:
+            raise KeyError("SESSION_NOT_FOUND")
         session.collaborators[principal.actor_id] = invitation.role
         invitation.status = "JOINED"
         session.audit.append(self._event(principal, "COLLABORATOR_JOINED", role=invitation.role))
+        self._repository.save_session(session)
+        self._repository.save_invitation(invitation)
         return {
             "invitation": self._invitation_payload(invitation),
             "session": self.session_payload(session),
@@ -221,11 +257,7 @@ class ConsoleService:
 
     def list_collaboration(self, principal: Principal, session_id: str) -> dict:
         session = self.get_session(principal, session_id)
-        invitations = [
-            self._invitation_payload(item)
-            for item in self._invitations.values()
-            if item.session_id == session_id
-        ]
+        invitations = [self._invitation_payload(item) for item in self._repository.list_invitations(session_id)]
         return {
             "owner_id": session.owner_id,
             "participants": [
@@ -239,12 +271,14 @@ class ConsoleService:
         session = self.get_session(principal, session_id)
         if principal.actor_id != session.owner_id:
             raise ConsoleAuthorizationError("OWNER_REQUIRED")
-        invitation = self._invitations.get(token)
+        invitation = self._repository.get_invitation(token)
         if invitation is None or invitation.session_id != session_id:
             raise KeyError("INVITATION_NOT_FOUND")
         invitation.status = "REVOKED"
         session.collaborators.pop(invitation.actor_id, None)
         session.audit.append(self._event(principal, "COLLABORATION_INVITATION_REVOKED", actor_id=invitation.actor_id))
+        self._repository.save_session(session)
+        self._repository.save_invitation(invitation)
         return self._invitation_payload(invitation)
 
     @staticmethod

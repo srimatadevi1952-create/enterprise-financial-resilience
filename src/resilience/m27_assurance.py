@@ -113,11 +113,21 @@ class OperationalAssuranceService:
     and client feed are connected; the API always discloses that boundary.
     """
 
-    def __init__(self, state_provider=None):
+    def __init__(self, state_provider=None, *, decision_loader=None, event_recorder=None):
         self._state_provider = state_provider
+        self._decision_loader = decision_loader
+        self._event_recorder = event_recorder
         self._decision = "AWAITING_DECISION"
         self._decision_events: list[dict] = []
         self._view_events: list[dict] = []
+
+    def _sync_decision(self) -> None:
+        if self._decision_loader:
+            self._decision = self._decision_loader()
+
+    def _record_external(self, event_type: str, event: dict) -> None:
+        if self._event_recorder:
+            self._event_recorder(event_type, event)
 
     def _enterprise(self) -> dict:
         state = self._state_provider().as_dict() if self._state_provider else {
@@ -174,6 +184,7 @@ class OperationalAssuranceService:
         }
 
     def bootstrap(self, principal: Principal, view: str) -> dict:
+        self._sync_decision()
         scope = {
             "enterprise": "assurance:enterprise:view",
             "consultant": "assurance:consultant:view",
@@ -188,6 +199,7 @@ class OperationalAssuranceService:
                 "view": view,
                 "outcome": "DENIED",
             })
+            self._record_external("VIEW", self._view_events[-1])
             raise ConsoleAuthorizationError("ASSURANCE_VIEW_DENIED")
         source = {"enterprise": self._enterprise, "consultant": self._consultant, "client": self._client}[view]()
         self._view_events.append({
@@ -196,6 +208,7 @@ class OperationalAssuranceService:
             "view": view,
             "outcome": "GRANTED",
         })
+        self._record_external("VIEW", self._view_events[-1])
         return {
             **json.loads(json.dumps(source)),
             "principal": {"actor_id": principal.actor_id, "display_name": principal.display_name},
@@ -234,6 +247,7 @@ class OperationalAssuranceService:
         return {"title": panel, "rows": [{"label": a, "value": b} for a, b in common[panel]], "source": workspace["measure_context"], "read_only": True}
 
     def record_client_decision(self, principal: Principal, decision: str, *, step_up_verified: bool, rationale: str = "") -> dict:
+        self._sync_decision()
         if "assurance:client:decide" not in principal.scopes:
             raise ConsoleAuthorizationError("CLIENT_DECISION_DENIED")
         if not step_up_verified:
@@ -245,6 +259,7 @@ class OperationalAssuranceService:
         self._decision = decision
         event = {"at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(), "actor_id": principal.actor_id, "decision": decision, "rationale": rationale, "live_actions": 0}
         self._decision_events.append(event)
+        self._record_external("DECISION", event)
         return {**event, "status": decision, "sandbox_execution_enabled": decision == "APPROVED", "live_actions": 0}
 
 

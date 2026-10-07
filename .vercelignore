@@ -1,0 +1,10 @@
+.git
+.local
+.venv
+.pytest_cache
+artifacts
+review-input
+tests
+docs/client
+**/__pycache__
+*.pyc
