@@ -10,4 +10,5 @@ sys.path.insert(0, str(ROOT / "src"))
 from resilience.m22_web import ConsoleApplication, make_handler  # noqa: E402
 
 
-handler = make_handler(ConsoleApplication())
+class handler(make_handler(ConsoleApplication())):
+    """Explicit Vercel entry point backed by the console HTTP handler."""

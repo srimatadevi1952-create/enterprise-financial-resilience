@@ -133,7 +133,7 @@ def test_vercel_package_declares_single_python_entry_and_durable_tables():
     assert "api/index.py" in config["functions"]
     assert config["rewrites"][0]["destination"] == "/api/index.py"
     entry = (ROOT / "api" / "index.py").read_text(encoding="utf-8")
-    assert "handler = make_handler(ConsoleApplication())" in entry
+    assert "class handler(make_handler(ConsoleApplication())):" in entry
     schema = (ROOT / "deploy" / "m29_hosted_schema.sql").read_text(encoding="utf-8")
     for table in ("auth_users", "login_challenges", "web_sessions", "auth_audit_events", "simulation_sessions", "collaboration_invitations", "assurance_state", "assurance_events"):
         assert f"efr_uat.{table}" in schema
